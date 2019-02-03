@@ -75,20 +75,22 @@ namespace houdini_alembic {
 		if (header->isCompound() && metaData.get("podName") == "string") {
 			ICompoundProperty string_compound(parent, key);
 			StringArraySamplePtr values = get_typed_array_property<IStringArrayProperty>(string_compound, ".vals", selector);
+			auto values_count = values->size();
 			auto values_ptr = values->get();
 
 			UInt32ArraySamplePtr indices = get_typed_array_property<IUInt32ArrayProperty>(string_compound, ".indices", selector);
+			auto indices_count = indices->size();
 			auto indices_ptr = indices->get();
 
 			std::vector<AttributeString> string_source;
-			string_source.reserve(values->size());
-			for (int i = 0; i < values->size(); ++i) {
+			string_source.reserve(values_count);
+			for (int i = 0; i < values_count; ++i) {
 				string_source.emplace_back(values_ptr[i]);
 			}
 
 			auto attributes = std::shared_ptr<AttributeStringColumn>(new AttributeStringColumn());
-			attributes->rows.reserve(indices->size());
-			for (int i = 0; i < indices->size(); ++i) {
+			attributes->rows.reserve(indices_count);
+			for (int i = 0; i < indices_count; ++i) {
 				auto index = indices_ptr[i];
 				attributes->rows.emplace_back(string_source[index]);
 			}
@@ -101,11 +103,12 @@ namespace houdini_alembic {
 			auto values_ptr = values->get();
 
 			UInt32ArraySamplePtr indices = get_typed_array_property<IUInt32ArrayProperty>(string_compound, ".indices", selector);
+			auto indices_count = indices->size();
 			auto indices_ptr = indices->get();
 
 			auto attributes = std::shared_ptr<AttributeVector2Column>(new AttributeVector2Column());
-			attributes->rows.reserve(indices->size());
-			for (int i = 0; i < indices->size(); ++i) {
+			attributes->rows.reserve(indices_count);
+			for (int i = 0; i < indices_count; ++i) {
 				auto index = indices_ptr[i];
 				auto value = values_ptr[index];
 				attributes->rows.emplace_back(value.x, value.y);
@@ -120,18 +123,19 @@ namespace houdini_alembic {
 		else if (IFloatArrayProperty::matches(*header, kNoMatching)) {
 			// float, vector2, vector3, vector4 handling
 			FloatArraySamplePtr value = get_typed_array_property<IFloatArrayProperty>(parent, key, selector);
+			auto value_size = value->size();
 			auto value_ptr = value->get();
 			uint8_t extent = header->getDataType().getExtent();
 
 			if (extent == 1) {
 				int arrayExtent = getArrayExtent(metaData);
-				if (value->size() % arrayExtent != 0) {
+				if (value_size % arrayExtent != 0) {
 					throw std::runtime_error("invalid arrayExtent");
 				}
 				if (arrayExtent == 1) {
 					auto attributes = std::shared_ptr<AttributeFloatColumn>(new AttributeFloatColumn());
-					attributes->rows.reserve(value->size());
-					for (int i = 0; i < value->size(); ++i) {
+					attributes->rows.reserve(value_size);
+					for (int i = 0; i < value_size; ++i) {
 						auto v = value_ptr[i];
 						attributes->rows.emplace_back(v);
 					}
@@ -140,9 +144,9 @@ namespace houdini_alembic {
 				}
 				else if (arrayExtent == 2) {
 					auto attributes = std::shared_ptr<AttributeVector2Column>(new AttributeVector2Column());
-					int n = value->size() / arrayExtent;
+					auto n = value_size / arrayExtent;
 					attributes->rows.reserve(n);
-					for (int i = 0; i < value->size(); i += arrayExtent) {
+					for (int i = 0; i < value_size; i += arrayExtent) {
 						attributes->rows.emplace_back(value_ptr[i], value_ptr[i + 1]);
 					}
 					attributeColumn = attributes;
@@ -150,9 +154,9 @@ namespace houdini_alembic {
 				}
 				else if (arrayExtent == 3) {
 					auto attributes = std::shared_ptr<AttributeVector3Column>(new AttributeVector3Column());
-					int n = value->size() / arrayExtent;
+					auto n = value_size / arrayExtent;
 					attributes->rows.reserve(n);
-					for (int i = 0; i < value->size(); i += arrayExtent) {
+					for (int i = 0; i < value_size; i += arrayExtent) {
 						attributes->rows.emplace_back(value_ptr[i], value_ptr[i + 1], value_ptr[i + 2]);
 					}
 					attributeColumn = attributes;
@@ -160,9 +164,9 @@ namespace houdini_alembic {
 				}
 				else if (arrayExtent == 4) {
 					auto attributes = std::shared_ptr<AttributeVector4Column>(new AttributeVector4Column());
-					int n = value->size() / arrayExtent;
+					auto n = value_size / arrayExtent;
 					attributes->rows.reserve(n);
-					for (int i = 0; i < value->size(); i += arrayExtent) {
+					for (int i = 0; i < value_size; i += arrayExtent) {
 						attributes->rows.emplace_back(value_ptr[i], value_ptr[i + 1], value_ptr[i + 2], value_ptr[i + 3]);
 					}
 					attributeColumn = attributes;
@@ -171,8 +175,8 @@ namespace houdini_alembic {
 			}
 			else if (extent == 3) {
 				auto attributes = std::shared_ptr<AttributeVector3Column>(new AttributeVector3Column());
-				attributes->rows.reserve(value->size());
-				for (int i = 0; i < value->size(); ++i) {
+				attributes->rows.reserve(value_size);
+				for (int i = 0; i < value_size; ++i) {
 					int index = i * extent;
 					auto v0 = value_ptr[index];
 					auto v1 = value_ptr[index + 1];
@@ -185,11 +189,12 @@ namespace houdini_alembic {
 		}
 		else if (IInt32ArrayProperty::matches(*header)) {
 			Int32ArraySamplePtr value = get_typed_array_property<IInt32ArrayProperty>(parent, key, selector);
+			auto value_size = value->size();
 			auto value_ptr = value->get();
 
 			auto attributes = std::shared_ptr<AttributeIntColumn>(new AttributeIntColumn());
-			attributes->rows.reserve(value->size());
-			for (int i = 0; i < value->size(); ++i) {
+			attributes->rows.reserve(value_size);
+			for (int i = 0; i < value_size; ++i) {
 				auto v = value_ptr[i];
 				attributes->rows.emplace_back(v);
 			}
@@ -198,11 +203,12 @@ namespace houdini_alembic {
 		}
 		else if (IStringArrayProperty::matches(*header)) {
 			StringArraySamplePtr value = get_typed_array_property<IStringArrayProperty>(parent, key, selector);
+			auto value_size = value->size();
 			auto value_ptr = value->get();
 
 			auto attributes = std::shared_ptr<AttributeStringColumn>(new AttributeStringColumn());
-			attributes->rows.reserve(value->size());
-			for (int i = 0; i < value->size(); ++i) {
+			attributes->rows.reserve(value_size);
+			for (int i = 0; i < value_size; ++i) {
 				auto v = value_ptr[i];
 				attributes->rows.emplace_back(v);
 			}
