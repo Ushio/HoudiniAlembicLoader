@@ -339,6 +339,7 @@ void ofApp::setup() {
 	_camera_model.load("camera_model.ply");
 
 	open_alembic(ofToDataPath("example2.abc"));
+
 }
 void ofApp::exit() {
 	ImGui_ImplOpenGL2_Shutdown();
