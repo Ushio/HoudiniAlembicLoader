@@ -118,29 +118,29 @@ namespace houdini_alembic {
 	using AttributeVector3 = Vector3f;
 	using AttributeVector4 = Vector4f;
 
-	class AttributeString : public IStringConvertible {
-	public:
-		AttributeString() {
+	//class AttributeString : public IStringConvertible {
+	//public:
+	//	AttributeString() {
 
-		}
-		AttributeString(const char *v) :_value(new std::string(v)) {
+	//	}
+	//	AttributeString(const char *v) :_value(new std::string(v)) {
 
-		}
-		AttributeString(const std::string &v) :_value(new std::string(v)) {
+	//	}
+	//	AttributeString(const std::string &v) :_value(new std::string(v)) {
 
-		}
-		operator std::string() const {
-			return *_value;
-		}
-		std::string value() const {
-			return *_value;
-		}
-		void to_string(char *buffer, std::size_t buffersize) const override {
-			snprintf(buffer, buffersize, "%s", _value->c_str());
-		}
-	private:
-		std::shared_ptr<std::string> _value = std::shared_ptr<std::string>(new std::string());
-	};
+	//	}
+	//	operator std::string() const {
+	//		return *_value;
+	//	}
+	//	std::string value() const {
+	//		return *_value;
+	//	}
+	//	void to_string(char *buffer, std::size_t buffersize) const override {
+	//		snprintf(buffer, buffersize, "%s", _value->c_str());
+	//	}
+	//private:
+	//	std::shared_ptr<std::string> _value = std::shared_ptr<std::string>(new std::string());
+	//};
 
 	class AttributeColumn {
 	public:
@@ -175,7 +175,26 @@ namespace houdini_alembic {
 	using AttributeVector2Column = AttributeColumnT<AttributeVector2>;
 	using AttributeVector3Column = AttributeColumnT<AttributeVector3>;
 	using AttributeVector4Column = AttributeColumnT<AttributeVector4>;
-	using AttributeStringColumn = AttributeColumnT<AttributeString>;
+
+	class AttributeStringColumn : public AttributeColumn {
+	public:
+		void get(std::size_t index, char *buffer, std::size_t buffersize) const {
+			get_as_string(index, buffer, buffersize);
+		}
+		std::size_t rowCount() const override {
+			return _indices.size();
+		}
+		std::size_t maxStringLength() const {
+			return _max_string_length;
+		}
+		void get_as_string(std::size_t index, char *buffer, std::size_t buffersize) const {
+			snprintf(buffer, buffersize, "%s", _indexed_strings[_indices[index]].c_str());
+		}
+		std::size_t _max_string_length = 0;
+		std::vector<uint32_t> _indices;
+		std::vector<std::string> _indexed_strings;
+	};
+	// using AttributeStringColumn = AttributeColumnT<AttributeString>;
 
 	class AttributeSpreadSheet {
 	public:
@@ -216,8 +235,8 @@ namespace houdini_alembic {
 		/*
 		get value by key and column. if the key don't exist, a exception will be thrown. No Range Check.
 		*/
-		AttributeString get_as_string(size_t index, const char *key) const {
-			return get_as_string(key)->get(index);
+		void get_as_string(size_t index, const char *key, char *buffer, std::size_t buffersize) const {
+			get_as_string(key)->get(index, buffer, buffersize);
 		}
 		AttributeFloat get_as_float(size_t index, const char *key) const {
 			return get_as_float(key)->get(index);

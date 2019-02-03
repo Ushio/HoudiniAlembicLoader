@@ -82,19 +82,34 @@ namespace houdini_alembic {
 			auto indices_count = indices->size();
 			auto indices_ptr = indices->get();
 
-			std::vector<AttributeString> string_source;
-			string_source.reserve(values_count);
-			for (int i = 0; i < values_count; ++i) {
-				string_source.emplace_back(values_ptr[i]);
-			}
-
 			auto attributes = std::shared_ptr<AttributeStringColumn>(new AttributeStringColumn());
-			attributes->rows.reserve(indices_count);
-			for (int i = 0; i < indices_count; ++i) {
-				auto index = indices_ptr[i];
-				attributes->rows.emplace_back(string_source[index]);
+			attributes->_indexed_strings.reserve(values_count);
+			std::size_t maxLength = 0;
+			for (int i = 0; i < values_count; ++i) {
+				attributes->_indexed_strings.emplace_back(values_ptr[i]);
+				maxLength = std::max(maxLength, values_ptr[i].length());
+			}
+			attributes->_max_string_length = maxLength;
+
+			attributes->_indices.reserve(indices_count);
+			for (std::size_t i = 0; i < indices_count; ++i) {
+				attributes->_indices.emplace_back(indices_ptr[i]);
 			}
 			attributeColumn = attributes;
+
+			//std::vector<AttributeString> string_source;
+			//string_source.reserve(values_count);
+			//for (int i = 0; i < values_count; ++i) {
+			//	string_source.emplace_back(values_ptr[i]);
+			//}
+
+			//auto attributes = std::shared_ptr<AttributeStringColumn>(new AttributeStringColumn());
+			//attributes->rows.reserve(indices_count);
+			//for (int i = 0; i < indices_count; ++i) {
+			//	auto index = indices_ptr[i];
+			//	attributes->rows.emplace_back(string_source[index]);
+			//}
+			//attributeColumn = attributes;
 			return true;
 		} 
 		else if (header->isCompound() && metaData.get("podName") == "float32_t" && metaData.get("podExtent") == "2") {
@@ -207,12 +222,23 @@ namespace houdini_alembic {
 			auto value_ptr = value->get();
 
 			auto attributes = std::shared_ptr<AttributeStringColumn>(new AttributeStringColumn());
-			attributes->rows.reserve(value_size);
-			for (int i = 0; i < value_size; ++i) {
-				auto v = value_ptr[i];
-				attributes->rows.emplace_back(v);
+			attributes->_indices.reserve(value_size);
+			attributes->_indexed_strings.reserve(value_size);
+			std::size_t maxLength = 0;
+			for (std::size_t i = 0; i < value_size; ++i) {
+				attributes->_indices.emplace_back(i);
+				attributes->_indexed_strings.emplace_back(value_ptr[i]);
+				maxLength = std::max(maxLength, value_ptr[i].length());
 			}
-			attributeColumn = attributes;
+			attributes->_max_string_length = maxLength;
+
+			//attributes->rows.reserve(value_size);
+			//for (int i = 0; i < value_size; ++i) {
+			//	auto v = value_ptr[i];
+			//	attributes->rows.emplace_back(v);
+			//}
+			//attributeColumn = attributes;
+
 			return true;
 		}
 		

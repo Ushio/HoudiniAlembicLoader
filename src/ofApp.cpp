@@ -259,7 +259,7 @@ inline void show_sheet(const houdini_alembic::AttributeSpreadSheet &sheet) {
 			ImGui::NextColumn();
 		}
 
-		if (1000 < i) {
+		if (10000 < i) {
 			breaked = true;
 			break;
 		}
@@ -268,7 +268,7 @@ inline void show_sheet(const houdini_alembic::AttributeSpreadSheet &sheet) {
 	ImGui::EndChild();
 
 	if (breaked) {
-		ImGui::Text("skipped 1000 over points...");
+		ImGui::Text("skipped 10000 over points...");
 	}
 }
 inline void show_polygon_sheet(std::shared_ptr<houdini_alembic::PolygonMeshObject> object) {
@@ -436,6 +436,8 @@ inline void drawAlembicScene(std::shared_ptr<houdini_alembic::AlembicScene> scen
 //--------------------------------------------------------------
 void ofApp::draw() {
 	static int sample_index = 0;
+	static bool hide_ui = false;
+	static bool hide_model = false;
 
 	ofEnableDepthTest();
 
@@ -460,7 +462,7 @@ void ofApp::draw() {
 		}
 	}
 
-	if (_scene) {
+	if (_scene && hide_model == false) {
 		drawAlembicScene(_scene, _camera_model);
 	}
 
@@ -492,24 +494,29 @@ void ofApp::draw() {
 	ImGui::InputInt("Sample Index", &sample_index, 1);
 	ImGui::SliderInt("Sample Index Slider", &sample_index, 0, 255);
 
-	if (ImGui::BeginTabBar("Alembic", ImGuiTabBarFlags_None))
-	{
-		if (_archive) {
-			if (ImGui::BeginTabItem("Alembic Raw Hierarchy"))
-			{
-				show_alembic_hierarchy(_archive.getTop(), sample_index);
-				ImGui::EndTabItem();
+	ImGui::Checkbox("hide ui", &hide_ui);
+	ImGui::Checkbox("hide model", &hide_model);
+	
+	if (hide_ui == false) {
+		if (ImGui::BeginTabBar("Alembic", ImGuiTabBarFlags_None))
+		{
+			if (_archive) {
+				if (ImGui::BeginTabItem("Alembic Raw Hierarchy"))
+				{
+					show_alembic_hierarchy(_archive.getTop(), sample_index);
+					ImGui::EndTabItem();
+				}
 			}
-		}
-		if (_scene) {
-			if (ImGui::BeginTabItem("Geometry Spread Sheet"))
-			{
-				ImGui::Text("Frame Count: %d", _storage.frameCount());
-				show_houdini_alembic(_scene);
-				ImGui::EndTabItem();
+			if (_scene) {
+				if (ImGui::BeginTabItem("Geometry Spread Sheet"))
+				{
+					ImGui::Text("Frame Count: %d", _storage.frameCount());
+					show_houdini_alembic(_scene);
+					ImGui::EndTabItem();
+				}
 			}
+			ImGui::EndTabBar();
 		}
-		ImGui::EndTabBar();
 	}
 
 	ImGui::End();
