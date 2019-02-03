@@ -10,7 +10,7 @@ namespace houdini_alembic {
 	class IStringConvertible {
 	public:
 		virtual ~IStringConvertible() {}
-		virtual std::string to_string() const = 0;
+		virtual void to_string(char *buffer, std::size_t buffersize) const = 0;
 	};
 
 	class Vector2f : public IStringConvertible {
@@ -21,10 +21,8 @@ namespace houdini_alembic {
 		float x = 0.0f;
 		float y = 0.0f;
 
-		std::string to_string() const override {
-			std::stringstream ss;
-			ss << x << ", " << y;
-			return ss.str();
+		void to_string(char *buffer, std::size_t buffersize) const override {
+			snprintf(buffer, buffersize, "(%f, %f)", x, y);
 		}
 	};
 
@@ -37,10 +35,8 @@ namespace houdini_alembic {
 		float y = 0.0f;
 		float z = 0.0f;
 
-		std::string to_string() const override {
-			std::stringstream ss;
-			ss << x << ", " << y << ", " << z;
-			return ss.str();
+		void to_string(char *buffer, std::size_t buffersize) const override {
+			snprintf(buffer, buffersize, "(%f, %f, %f)", x, y, z);
 		}
 	};
 	class Vector4f : public IStringConvertible {
@@ -53,10 +49,8 @@ namespace houdini_alembic {
 		float z = 0.0f;
 		float w = 0.0f;
 
-		std::string to_string() const override {
-			std::stringstream ss;
-			ss << x << ", " << y << ", " << z << ", " << w;
-			return ss.str();
+		void to_string(char *buffer, std::size_t buffersize) const override {
+			snprintf(buffer, buffersize, "(%f, %f, %f, %f)", x, y, z, w);
 		}
 	};
 
@@ -93,10 +87,8 @@ namespace houdini_alembic {
 		float value() const {
 			return _value;
 		}
-		std::string to_string() const override {
-			std::stringstream ss;
-			ss << _value;
-			return ss.str();
+		void to_string(char *buffer, std::size_t buffersize) const override {
+			snprintf(buffer, buffersize, "%f", _value);
 		}
 	private:
 		float _value = 0.0f;
@@ -115,10 +107,8 @@ namespace houdini_alembic {
 		int value() const {
 			return _value;
 		}
-		std::string to_string() const override {
-			std::stringstream ss;
-			ss << _value;
-			return ss.str();
+		void to_string(char *buffer, std::size_t buffersize) const override {
+			snprintf(buffer, buffersize, "%d", _value);
 		}
 	private:
 		int _value = 0;
@@ -145,8 +135,8 @@ namespace houdini_alembic {
 		std::string value() const {
 			return *_value;
 		}
-		std::string to_string() const override {
-			return *_value;
+		void to_string(char *buffer, std::size_t buffersize) const override {
+			snprintf(buffer, buffersize, "%s", _value->c_str());
 		}
 	private:
 		std::shared_ptr<std::string> _value = std::shared_ptr<std::string>(new std::string());
@@ -162,7 +152,7 @@ namespace houdini_alembic {
 			return typeid(*this) == typeid(T);
 		}
 
-		virtual std::string get_as_string(std::size_t index) const = 0;
+		virtual void get_as_string(std::size_t index, char *buffer, std::size_t buffersize) const = 0;
 	};
 	template <class T>
 	class AttributeColumnT : public AttributeColumn {
@@ -173,9 +163,9 @@ namespace houdini_alembic {
 		std::size_t rowCount() const override {
 			return rows.size();
 		}
-		virtual std::string get_as_string(std::size_t index) const {
+		void get_as_string(std::size_t index, char *buffer, std::size_t buffersize) const {
 			const IStringConvertible &convertible = rows[index];
-			return convertible.to_string();
+			convertible.to_string(buffer, buffersize);
 		}
 		std::vector<T> rows;
 	};

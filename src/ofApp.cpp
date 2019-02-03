@@ -250,14 +250,26 @@ inline void show_sheet(const houdini_alembic::AttributeSpreadSheet &sheet) {
 	}
 	ImGui::Separator();
 
+	char buffer[64];
+	bool breaked = false;
 	for (int i = 0; i < sheet.rowCount(); i++) {
 		for (auto col : sheet.sheet) {
-			ImGui::Text("%s", col.second->get_as_string(i).c_str());
+			col.second->get_as_string(i, buffer, sizeof(buffer));
+			ImGui::Text("%s", buffer);
 			ImGui::NextColumn();
+		}
+
+		if (1000 < i) {
+			breaked = true;
+			break;
 		}
 	}
 
 	ImGui::EndChild();
+
+	if (breaked) {
+		ImGui::Text("skipped 1000 over points...");
+	}
 }
 inline void show_polygon_sheet(std::shared_ptr<houdini_alembic::PolygonMeshObject> object) {
 	ImGui::Text("[PolygonMeshObject]");
@@ -324,7 +336,9 @@ void ofApp::setup() {
 	_camera.setFarClip(100.0f);
 	_camera.setDistance(5.0f);
 
-	open_alembic(ofToDataPath("example1.abc"));
+	_camera_model.load("camera_model.ply");
+
+	open_alembic(ofToDataPath("example2.abc"));
 }
 void ofApp::exit() {
 	ImGui_ImplOpenGL2_Shutdown();
@@ -393,10 +407,16 @@ inline void drawAlembicPolygon(std::shared_ptr<houdini_alembic::PolygonMeshObjec
 		ofPopMatrix();
 	}
 }
-inline void drawAlembicPolygon(std::shared_ptr<houdini_alembic::CameraObject> camera) {
+inline void drawAlembicCamera(std::shared_ptr<houdini_alembic::CameraObject> camera, ofMesh &camera_model) {
+	ofPushMatrix();
+	ofMultMatrix(camera->combinedXforms.value_ptr());
 
+	ofSetColor(200);
+	camera_model.drawWireframe();
+	ofDrawAxis(0.5f);
+	ofPopMatrix();
 }
-inline void drawAlembicScene(std::shared_ptr<houdini_alembic::AlembicScene> scene) {
+inline void drawAlembicScene(std::shared_ptr<houdini_alembic::AlembicScene> scene, ofMesh &camera_model) {
 	for (auto o : scene->objects) {
 		if (o->visible == false) {
 			continue;
@@ -406,7 +426,8 @@ inline void drawAlembicScene(std::shared_ptr<houdini_alembic::AlembicScene> scen
 			drawAlembicPolygon(polygon);
 		}
 		else if (o->type() == houdini_alembic::SceneObjectType_Camera) {
-
+			auto camera = std::dynamic_pointer_cast<houdini_alembic::CameraObject>(o);
+			drawAlembicCamera(camera, camera_model);
 		}
 	}
 }
@@ -439,7 +460,7 @@ void ofApp::draw() {
 	}
 
 	if (_scene) {
-		drawAlembicScene(_scene);
+		drawAlembicScene(_scene, _camera_model);
 	}
 
 	_camera.end();
@@ -482,6 +503,7 @@ void ofApp::draw() {
 		if (_scene) {
 			if (ImGui::BeginTabItem("Geometry Spread Sheet"))
 			{
+				ImGui::Text("Frame Count: %d", _storage.frameCount());
 				show_houdini_alembic(_scene);
 				ImGui::EndTabItem();
 			}
@@ -548,5 +570,9 @@ void ofApp::gotMessage(ofMessage msg){
 
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo){ 
+	if (dragInfo.files.empty()) {
+		return;
+	}
 
+	open_alembic(dragInfo.files[0]);
 }

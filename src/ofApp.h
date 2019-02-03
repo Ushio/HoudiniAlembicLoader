@@ -38,4 +38,6 @@ public:
 	IArchive _archive;
 	houdini_alembic::AlembicStorage _storage;
 	std::shared_ptr<houdini_alembic::AlembicScene> _scene;
+
+	ofMesh _camera_model;
 };
