@@ -324,6 +324,8 @@ void ofApp::setup() {
 	_camera.setFarClip(100.0f);
 	_camera.setDistance(5.0f);
 
+	_camera_model.load("camera_model.ply");
+
 	open_alembic(ofToDataPath("example1.abc"));
 }
 void ofApp::exit() {
@@ -393,10 +395,16 @@ inline void drawAlembicPolygon(std::shared_ptr<houdini_alembic::PolygonMeshObjec
 		ofPopMatrix();
 	}
 }
-inline void drawAlembicPolygon(std::shared_ptr<houdini_alembic::CameraObject> camera) {
+inline void drawAlembicCamera(std::shared_ptr<houdini_alembic::CameraObject> camera, ofMesh &camera_model) {
+	ofPushMatrix();
+	ofMultMatrix(camera->combinedXforms.value_ptr());
 
+	ofSetColor(200);
+	camera_model.drawWireframe();
+	ofDrawAxis(0.5f);
+	ofPopMatrix();
 }
-inline void drawAlembicScene(std::shared_ptr<houdini_alembic::AlembicScene> scene) {
+inline void drawAlembicScene(std::shared_ptr<houdini_alembic::AlembicScene> scene, ofMesh &camera_model) {
 	for (auto o : scene->objects) {
 		if (o->visible == false) {
 			continue;
@@ -406,7 +414,8 @@ inline void drawAlembicScene(std::shared_ptr<houdini_alembic::AlembicScene> scen
 			drawAlembicPolygon(polygon);
 		}
 		else if (o->type() == houdini_alembic::SceneObjectType_Camera) {
-
+			auto camera = std::dynamic_pointer_cast<houdini_alembic::CameraObject>(o);
+			drawAlembicCamera(camera, camera_model);
 		}
 	}
 }
@@ -439,7 +448,7 @@ void ofApp::draw() {
 	}
 
 	if (_scene) {
-		drawAlembicScene(_scene);
+		drawAlembicScene(_scene, _camera_model);
 	}
 
 	_camera.end();
@@ -548,5 +557,9 @@ void ofApp::gotMessage(ofMessage msg){
 
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo){ 
+	if (dragInfo.files.empty()) {
+		return;
+	}
 
+	open_alembic(dragInfo.files[0]);
 }

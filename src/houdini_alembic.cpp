@@ -264,7 +264,9 @@ namespace houdini_alembic {
 		if (IPolyMesh::matches(header)) {
 			IPolyMesh polyMesh(o);
 			std::shared_ptr<PolygonMeshObject> object(new PolygonMeshObject());
-			object->name = IXform(o.getParent()).getFullName();
+
+			IXform parentXForm(o.getParent());
+			object->name = parentXForm.getFullName();
 
 			for (int i = 0; i < xforms.size(); ++i) {
 				object->xforms.push_back(to(xforms[i]));
@@ -274,10 +276,14 @@ namespace houdini_alembic {
 			parse_polymesh(polyMesh, object, selector);
 
 			// http://www.sidefx.com/ja/docs/houdini/io/alembic.html#%E5%8F%AF%E8%A6%96%E6%80%A7
-			IXform parentXForm(o.getParent());
-
-			int8_t visible = get_typed_scalar_property<ICharProperty>(parentXForm.getProperties(), "visible", selector);
-			object->visible = visible == -1;
+			auto parentProp = parentXForm.getProperties();
+			if (parentProp.getPropertyHeader("visible")) {
+				int8_t visible = get_typed_scalar_property<ICharProperty>(parentProp, "visible", selector);
+				object->visible = visible == -1;
+			}
+			else {
+				object->visible = true;
+			}
 
 			objects.push_back(object);
 		}
@@ -286,7 +292,9 @@ namespace houdini_alembic {
 			auto schema = camera.getSchema();
 
 			std::shared_ptr<CameraObject> object(new CameraObject());
-			object->name = IXform(o.getParent()).getFullName();
+
+			IXform parentXForm(o.getParent());
+			object->name = parentXForm.getFullName();
 
 			for (int i = 0; i < xforms.size(); ++i) {
 				object->xforms.push_back(to(xforms[i]));
@@ -295,9 +303,14 @@ namespace houdini_alembic {
 			object->combinedXforms = to(combined);
 
 			// http://www.sidefx.com/ja/docs/houdini/io/alembic.html#%E5%8F%AF%E8%A6%96%E6%80%A7
-			IXform parentXForm(o.getParent());
-			int8_t visible = get_typed_scalar_property<ICharProperty>(parentXForm.getProperties(), "visible", selector);
-			object->visible = visible == -1;
+			auto parentProp = parentXForm.getProperties();
+			if (parentProp.getPropertyHeader("visible")) {
+				int8_t visible = get_typed_scalar_property<ICharProperty>(parentProp, "visible", selector);
+				object->visible = visible == -1;
+			}
+			else {
+				object->visible = true;
+			}
 
 			
 			object->imageWidth = (int)get_typed_scalar_property<IFloatProperty>(schema.getUserProperties(), "resx", selector);
@@ -366,8 +379,15 @@ namespace houdini_alembic {
 			});
 
 			auto top = top_of_archive(_alembicArchive);
-			IUInt32Property samples(top.getProperties(), "1.samples");
-			samples.get(_frameCount);
+			auto prop = top.getProperties();
+			const char *kSample = "1.samples";
+			if (prop.getPropertyHeader(kSample)) {
+				IUInt32Property samples(top.getProperties(), kSample);
+				samples.get(_frameCount);
+			}
+			else {
+				_frameCount = 1;
+			}
 		}
 		catch (std::exception &e) {
 			error_message = e.what();
