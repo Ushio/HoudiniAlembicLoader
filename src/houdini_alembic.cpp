@@ -84,15 +84,15 @@ namespace houdini_alembic {
 
 			auto attributes = std::shared_ptr<AttributeStringColumn>(new AttributeStringColumn());
 			attributes->_indexed_strings.reserve(values_count);
-			std::size_t maxLength = 0;
+			uint32_t maxLength = 0;
 			for (int i = 0; i < values_count; ++i) {
 				attributes->_indexed_strings.emplace_back(values_ptr[i]);
-				maxLength = std::max(maxLength, values_ptr[i].length());
+				maxLength = std::max(maxLength, (uint32_t)values_ptr[i].length());
 			}
 			attributes->_max_string_length = maxLength;
 
 			attributes->_indices.reserve(indices_count);
-			for (std::size_t i = 0; i < indices_count; ++i) {
+			for (uint32_t i = 0; i < indices_count; ++i) {
 				attributes->_indices.emplace_back(indices_ptr[i]);
 			}
 			attributeColumn = attributes;
@@ -224,11 +224,11 @@ namespace houdini_alembic {
 			auto attributes = std::shared_ptr<AttributeStringColumn>(new AttributeStringColumn());
 			attributes->_indices.reserve(value_size);
 			attributes->_indexed_strings.reserve(value_size);
-			std::size_t maxLength = 0;
-			for (std::size_t i = 0; i < value_size; ++i) {
+			uint32_t maxLength = 0;
+			for (uint32_t i = 0; i < value_size; ++i) {
 				attributes->_indices.emplace_back(i);
 				attributes->_indexed_strings.emplace_back(value_ptr[i]);
-				maxLength = std::max(maxLength, value_ptr[i].length());
+				maxLength = std::max(maxLength, (uint32_t)value_ptr[i].length());
 			}
 			attributes->_max_string_length = maxLength;
 

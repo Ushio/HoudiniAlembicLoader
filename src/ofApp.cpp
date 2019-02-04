@@ -254,7 +254,7 @@ inline void show_sheet(const houdini_alembic::AttributeSpreadSheet &sheet) {
 	bool breaked = false;
 	for (int i = 0; i < sheet.rowCount(); i++) {
 		for (auto col : sheet.sheet) {
-			col.second->get_as_string(i, buffer, sizeof(buffer));
+			col.second->snprint(i, buffer, sizeof(buffer));
 			ImGui::Text("%s", buffer);
 			ImGui::NextColumn();
 		}
