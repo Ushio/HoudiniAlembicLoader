@@ -9,3 +9,9 @@ vcpkg install alembic:x64-windows
 
 ## demo
 ![demo](demo.gif)
+
+## TODO
+- Camera Attributes
+- Details Attributes
+- String Optimization
+- Code Example
