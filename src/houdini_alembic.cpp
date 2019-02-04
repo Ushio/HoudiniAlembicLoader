@@ -64,6 +64,34 @@ namespace houdini_alembic {
 		return (extent_s == "") ? 1 : atoi(extent_s.c_str());
 	}
 
+	template <int N>
+	class AttributeStraightforwardVectorNColumn : public AttributeVector3Column {
+	public:
+		enum {
+			DIMENSIONS = N
+		};
+		virtual void get(uint32_t index, float *xs) const override {
+			const float *p = _floats->get();
+			uint32_t src_index = index * N;
+			for (int i = 0; i < N; ++i) {
+				xs[i] = p[src_index + i];
+			}
+		}
+		uint32_t rowCount() const override {
+			return _floats->size();
+		}
+
+		FloatArraySamplePtr _floats;
+	};
+	class AttributeStraightforwardVector3Column : public AttributeStraightforwardVectorNColumn<3> {
+	public:
+		int snprint(uint32_t index, char *buffer, uint32_t buffersize) const override {
+			float xs[DIMENSIONS];
+			get(index, xs);
+			return snprintf(buffer, buffersize, "(%f, %f, %f)", xs[0], xs[1], xs[2]);
+		}
+	};
+
 	class AttributeStraightforwardStringColumn : public AttributeStringColumn {
 	public:
 		const std::string &get(uint32_t index) const override {
@@ -173,16 +201,16 @@ namespace houdini_alembic {
 					attributeColumn = attributes;
 					return true;
 				}
-				else if (arrayExtent == 3) {
-					auto attributes = std::shared_ptr<AttributeVector3Column>(new AttributeVector3Column());
-					auto n = value_size / arrayExtent;
-					attributes->rows.reserve(n);
-					for (int i = 0; i < value_size; i += arrayExtent) {
-						attributes->rows.emplace_back(value_ptr[i], value_ptr[i + 1], value_ptr[i + 2]);
-					}
-					attributeColumn = attributes;
-					return true;
-				}
+				//else if (arrayExtent == 3) {
+				//	auto attributes = std::shared_ptr<AttributeVector3ColumnNaive>(new AttributeVector3ColumnNaive());
+				//	auto n = value_size / arrayExtent;
+				//	attributes->rows.reserve(n);
+				//	for (int i = 0; i < value_size; i += arrayExtent) {
+				//		attributes->rows.emplace_back(value_ptr[i], value_ptr[i + 1], value_ptr[i + 2]);
+				//	}
+				//	attributeColumn = attributes;
+				//	return true;
+				//}
 				else if (arrayExtent == 4) {
 					auto attributes = std::shared_ptr<AttributeVector4Column>(new AttributeVector4Column());
 					auto n = value_size / arrayExtent;
@@ -195,15 +223,8 @@ namespace houdini_alembic {
 				}
 			}
 			else if (extent == 3) {
-				auto attributes = std::shared_ptr<AttributeVector3Column>(new AttributeVector3Column());
-				attributes->rows.reserve(value_size);
-				for (int i = 0; i < value_size; ++i) {
-					int index = i * extent;
-					auto v0 = value_ptr[index];
-					auto v1 = value_ptr[index + 1];
-					auto v2 = value_ptr[index + 2];
-					attributes->rows.emplace_back(v0, v1, v2);
-				}
+				auto attributes = std::shared_ptr<AttributeStraightforwardVector3Column>(new AttributeStraightforwardVector3Column());
+				attributes->_floats = value;
 				attributeColumn = attributes;
 				return true;
 			}

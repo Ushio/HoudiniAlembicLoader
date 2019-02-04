@@ -110,7 +110,7 @@ namespace houdini_alembic {
 	};
 
 	using AttributeVector2Column = AttributeColumnT<AttributeVector2>;
-	using AttributeVector3Column = AttributeColumnT<AttributeVector3>;
+	// using AttributeVector3Column = AttributeColumnT<AttributeVector3>;
 	using AttributeVector4Column = AttributeColumnT<AttributeVector4>;
 
 	class AttributeFloatColumn : public AttributeColumn {
@@ -138,6 +138,11 @@ namespace houdini_alembic {
 			return snprintf(buffer, buffersize, "%d", rows[index]);
 		}
 		std::vector<int32_t> rows;
+	};
+
+	class AttributeVector3Column : public AttributeColumn {
+	public:
+		virtual void get(uint32_t index, float *xyz) const = 0;
 	};
 	class AttributeStringColumn : public AttributeColumn {
 	public:
@@ -195,8 +200,11 @@ namespace houdini_alembic {
 		AttributeVector2 get_as_vector2(size_t index, const char *key) const {
 			return get_as_vector2(key)->get(index);
 		}
-		AttributeVector3 get_as_vector3(size_t index, const char *key) const {
-			return get_as_vector3(key)->get(index);
+		//AttributeVector3 get_as_vector3(size_t index, const char *key) const {
+		//	return get_as_vector3(key)->get(index);
+		//}
+		void get_as_vector3(size_t index, const char *key, float *xyz) const {
+			get_as_vector3(key)->get(index, xyz);
 		}
 		AttributeVector4 get_as_vector4(size_t index, const char *key) const {
 			return get_as_vector4(key)->get(index);

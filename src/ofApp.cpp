@@ -376,18 +376,24 @@ inline void drawAlembicPolygon(std::shared_ptr<houdini_alembic::PolygonMeshObjec
 		static ofMesh mesh;
 		mesh.clear();
 		mesh.setMode(OF_PRIMITIVE_TRIANGLES);
-		for (auto P : P_Column->rows) {
-			mesh.addVertex(glm::vec3(P.x, P.y, P.z));
+
+		int rowCount = P_Column->rowCount();
+		for (int i = 0; i < rowCount; ++i) {
+			glm::vec3 p;
+			P_Column->get(i, glm::value_ptr(p));
+			mesh.addVertex(glm::vec3(p));
 		}
+
 		for (auto index : polygon->indices) {
 			mesh.addIndex(index);
 		}
-		if (polygon->points.contains_key("Cd")) {
-			auto Cd = polygon->points.get_as_vector3("Cd");
-			for (auto color : Cd->rows) {
-				mesh.addColor(ofFloatColor(color.x, color.y, color.z));
-			}
-		}
+
+		//if (polygon->points.contains_key("Cd")) {
+		//	auto Cd = polygon->points.get_as_vector3("Cd");
+		//	for (auto color : Cd->rows) {
+		//		mesh.addColor(ofFloatColor(color.x, color.y, color.z));
+		//	}
+		//}
 
 		ofPushMatrix();
 		ofMultMatrix(polygon->combinedXforms.value_ptr());
