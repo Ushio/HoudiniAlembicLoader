@@ -340,6 +340,7 @@ void ofApp::setup() {
 
 	open_alembic(ofToDataPath("example2.abc"));
 
+	ofSetVerticalSync(false);
 }
 void ofApp::exit() {
 	ImGui_ImplOpenGL2_Shutdown();
@@ -438,6 +439,7 @@ void ofApp::draw() {
 	static int sample_index = 0;
 	static bool hide_ui = false;
 	static bool hide_model = false;
+	static bool loading = true;
 
 	ofEnableDepthTest();
 
@@ -456,9 +458,12 @@ void ofApp::draw() {
 
 	if (_storage.isOpened()) {
 		std::string error_message;
-		_scene = _storage.read(sample_index, error_message);
-		if (!_scene) {
-			printf("sample error_message: %s\n", error_message.c_str());
+
+		if (loading) {
+			_scene = _storage.read(sample_index, error_message);
+			if (!_scene) {
+				printf("sample error_message: %s\n", error_message.c_str());
+			}
 		}
 	}
 
@@ -496,6 +501,7 @@ void ofApp::draw() {
 
 	ImGui::Checkbox("hide ui", &hide_ui);
 	ImGui::Checkbox("hide model", &hide_model);
+	ImGui::Checkbox("loading", &loading);
 	
 	if (hide_ui == false) {
 		if (ImGui::BeginTabBar("Alembic", ImGuiTabBarFlags_None))

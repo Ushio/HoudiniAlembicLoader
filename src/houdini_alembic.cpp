@@ -63,6 +63,41 @@ namespace houdini_alembic {
 		std::string extent_s = meta.get("arrayExtent");
 		return (extent_s == "") ? 1 : atoi(extent_s.c_str());
 	}
+
+	class AttributeStraightforwardStringColumn : public AttributeStringColumn {
+	public:
+		const std::string &get(uint32_t index) const override {
+			const std::string *strings = _strings->get();
+			return strings[index];
+		}
+		uint32_t rowCount() const override {
+			return _strings->size();
+		}
+		int snprint(uint32_t index, char *buffer, uint32_t buffersize) const override {
+			const std::string &value = get(index);
+			return snprintf(buffer, buffersize, "%s", value.c_str());
+		}
+		StringArraySamplePtr _strings;
+	};
+
+	class AttributeIndexedStringColumn : public AttributeStringColumn {
+	public:
+		const std::string &get(uint32_t index) const override {
+			const std::string *strings = _indexed_strings->get();
+			const uint32_t *indices = _indices->get();
+			return strings[indices[index]];
+		}
+		uint32_t rowCount() const override {
+			return _indices->size();
+		}
+		int snprint(uint32_t index, char *buffer, uint32_t buffersize) const override {
+			const std::string &value = get(index);
+			return snprintf(buffer, buffersize, "%s", value.c_str());
+		}
+		UInt32ArraySamplePtr _indices;
+		StringArraySamplePtr _indexed_strings;
+	};
+
 	inline bool parse_attributes(ICompoundProperty parent, const std::string &key, ISampleSelector selector, std::shared_ptr<AttributeColumn> &attributeColumn, std::string &geoScope) {
 		auto header = parent.getPropertyHeader(key);
 		auto metaData = header->getMetaData();
@@ -74,42 +109,12 @@ namespace houdini_alembic {
 
 		if (header->isCompound() && metaData.get("podName") == "string") {
 			ICompoundProperty string_compound(parent, key);
-			StringArraySamplePtr values = get_typed_array_property<IStringArrayProperty>(string_compound, ".vals", selector);
-			auto values_count = values->size();
-			auto values_ptr = values->get();
 
-			UInt32ArraySamplePtr indices = get_typed_array_property<IUInt32ArrayProperty>(string_compound, ".indices", selector);
-			auto indices_count = indices->size();
-			auto indices_ptr = indices->get();
-
-			auto attributes = std::shared_ptr<AttributeStringColumn>(new AttributeStringColumn());
-			attributes->_indexed_strings.reserve(values_count);
-			uint32_t maxLength = 0;
-			for (int i = 0; i < values_count; ++i) {
-				attributes->_indexed_strings.emplace_back(values_ptr[i]);
-				maxLength = std::max(maxLength, (uint32_t)values_ptr[i].length());
-			}
-			attributes->_max_string_length = maxLength;
-
-			attributes->_indices.reserve(indices_count);
-			for (uint32_t i = 0; i < indices_count; ++i) {
-				attributes->_indices.emplace_back(indices_ptr[i]);
-			}
+			auto attributes = std::shared_ptr<AttributeIndexedStringColumn>(new AttributeIndexedStringColumn());
+			attributes->_indexed_strings = get_typed_array_property<IStringArrayProperty>(string_compound, ".vals", selector);
+			attributes->_indices = get_typed_array_property<IUInt32ArrayProperty>(string_compound, ".indices", selector);
 			attributeColumn = attributes;
 
-			//std::vector<AttributeString> string_source;
-			//string_source.reserve(values_count);
-			//for (int i = 0; i < values_count; ++i) {
-			//	string_source.emplace_back(values_ptr[i]);
-			//}
-
-			//auto attributes = std::shared_ptr<AttributeStringColumn>(new AttributeStringColumn());
-			//attributes->rows.reserve(indices_count);
-			//for (int i = 0; i < indices_count; ++i) {
-			//	auto index = indices_ptr[i];
-			//	attributes->rows.emplace_back(string_source[index]);
-			//}
-			//attributeColumn = attributes;
 			return true;
 		} 
 		else if (header->isCompound() && metaData.get("podName") == "float32_t" && metaData.get("podExtent") == "2") {
@@ -138,6 +143,7 @@ namespace houdini_alembic {
 		else if (IFloatArrayProperty::matches(*header, kNoMatching)) {
 			// float, vector2, vector3, vector4 handling
 			FloatArraySamplePtr value = get_typed_array_property<IFloatArrayProperty>(parent, key, selector);
+
 			auto value_size = value->size();
 			auto value_ptr = value->get();
 			uint8_t extent = header->getDataType().getExtent();
@@ -217,28 +223,9 @@ namespace houdini_alembic {
 			return true;
 		}
 		else if (IStringArrayProperty::matches(*header)) {
-			StringArraySamplePtr value = get_typed_array_property<IStringArrayProperty>(parent, key, selector);
-			auto value_size = value->size();
-			auto value_ptr = value->get();
-
-			auto attributes = std::shared_ptr<AttributeStringColumn>(new AttributeStringColumn());
-			attributes->_indices.reserve(value_size);
-			attributes->_indexed_strings.reserve(value_size);
-			uint32_t maxLength = 0;
-			for (uint32_t i = 0; i < value_size; ++i) {
-				attributes->_indices.emplace_back(i);
-				attributes->_indexed_strings.emplace_back(value_ptr[i]);
-				maxLength = std::max(maxLength, (uint32_t)value_ptr[i].length());
-			}
-			attributes->_max_string_length = maxLength;
-
-			//attributes->rows.reserve(value_size);
-			//for (int i = 0; i < value_size; ++i) {
-			//	auto v = value_ptr[i];
-			//	attributes->rows.emplace_back(v);
-			//}
-			//attributeColumn = attributes;
-
+			auto attributes = std::shared_ptr<AttributeStraightforwardStringColumn>(new AttributeStraightforwardStringColumn());
+			attributes->_strings = get_typed_array_property<IStringArrayProperty>(parent, key, selector);
+			attributeColumn = attributes;
 			return true;
 		}
 		

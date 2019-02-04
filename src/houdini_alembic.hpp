@@ -73,59 +73,22 @@ namespace houdini_alembic {
 		std::array<float, 16> value;
 	};
 
-	class AttributeFloat : public IStringConvertible {
-	public:
-		AttributeFloat() {
-
-		}
-		AttributeFloat(float v) :_value(v) {
-
-		}
-		operator float() const {
-			return _value;
-		}
-		float value() const {
-			return _value;
-		}
-		int snprint(char *buffer, uint32_t buffersize) const override {
-			return snprintf(buffer, buffersize, "%f", _value);
-		}
-	private:
-		float _value = 0.0f;
-	};
-	class AttributeInt : public IStringConvertible {
-	public:
-		AttributeInt() {
-
-		}
-		AttributeInt(int v) :_value(v) {
-
-		}
-		operator int() const {
-			return _value;
-		}
-		int value() const {
-			return _value;
-		}
-		int snprint(char *buffer, uint32_t buffersize) const override {
-			return snprintf(buffer, buffersize, "%d", _value);
-		}
-	private:
-		int _value = 0;
-	};
-
 	using AttributeVector2 = Vector2f;
 	using AttributeVector3 = Vector3f;
 	using AttributeVector4 = Vector4f;
 
 	class AttributeColumn {
 	public:
+		AttributeColumn() {}
+		AttributeColumn(const AttributeColumn &) = delete;
+		void operator=(const AttributeColumn &) = delete;
+
 		virtual ~AttributeColumn() {}
 		virtual uint32_t rowCount() const = 0;
 
 		template <class T>
-		bool is() const {
-			return typeid(*this) == typeid(T);
+		bool IsAssignableTo() const {
+			return dynamic_cast<T *>(this) != null;
 		}
 
 		virtual int snprint(uint32_t index, char *buffer, uint32_t buffersize) const = 0;
@@ -146,32 +109,40 @@ namespace houdini_alembic {
 		std::vector<T> rows;
 	};
 
-	using AttributeFloatColumn = AttributeColumnT<AttributeFloat>;
-	using AttributeIntColumn = AttributeColumnT<AttributeInt>;
 	using AttributeVector2Column = AttributeColumnT<AttributeVector2>;
 	using AttributeVector3Column = AttributeColumnT<AttributeVector3>;
 	using AttributeVector4Column = AttributeColumnT<AttributeVector4>;
 
-	class AttributeStringColumn : public AttributeColumn {
+	class AttributeFloatColumn : public AttributeColumn {
 	public:
-		const char *get(uint32_t index) const {
-			return _indexed_strings[_indices[index]].c_str();
+		float get(uint32_t index) const {
+			return rows[index];
 		}
 		uint32_t rowCount() const override {
-			return _indices.size();
-		}
-		uint32_t maxStringLength() const {
-			return _max_string_length;
+			return rows.size();
 		}
 		int snprint(uint32_t index, char *buffer, uint32_t buffersize) const override {
-			return snprintf(buffer, buffersize, "%s", _indexed_strings[_indices[index]].c_str());
+			return snprintf(buffer, buffersize, "%f", rows[index]);
 		}
-
-		uint32_t _max_string_length = 0;
-		std::vector<uint32_t> _indices;
-		std::vector<std::string> _indexed_strings;
+		std::vector<float> rows;
 	};
-	// using AttributeStringColumn = AttributeColumnT<AttributeString>;
+	class AttributeIntColumn : public AttributeColumn {
+	public:
+		int32_t get(uint32_t index) const {
+			return rows[index];
+		}
+		uint32_t rowCount() const override {
+			return rows.size();
+		}
+		int snprint(uint32_t index, char *buffer, uint32_t buffersize) const override {
+			return snprintf(buffer, buffersize, "%d", rows[index]);
+		}
+		std::vector<int32_t> rows;
+	};
+	class AttributeStringColumn : public AttributeColumn {
+	public:
+		virtual const std::string &get(uint32_t index) const = 0;
+	};
 
 	class AttributeSpreadSheet {
 	public:
@@ -212,13 +183,13 @@ namespace houdini_alembic {
 		/*
 		get value by key and column. if the key don't exist, a exception will be thrown. No Range Check.
 		*/
-		const char *get_as_string(size_t index, const char *key) const {
+		const std::string &get_as_string(size_t index, const char *key) const {
 			return get_as_string(key)->get(index);
 		}
-		AttributeFloat get_as_float(size_t index, const char *key) const {
+		float get_as_float(size_t index, const char *key) const {
 			return get_as_float(key)->get(index);
 		}
-		AttributeInt get_as_int(size_t index, const char *key) const {
+		int32_t get_as_int(size_t index, const char *key) const {
 			return get_as_int(key)->get(index);
 		}
 		AttributeVector2 get_as_vector2(size_t index, const char *key) const {
