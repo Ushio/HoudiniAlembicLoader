@@ -7,52 +7,43 @@
 #include <sstream>
 
 namespace houdini_alembic {
-	class IStringConvertible {
-	public:
-		virtual ~IStringConvertible() {}
-		virtual int snprint(char *buffer, uint32_t buffersize) const = 0;
-	};
+	//class Vector2f : public IStringConvertible {
+	//public:
+	//	Vector2f() {}
+	//	Vector2f(float x_, float y_) : x(x_), y(y_) {
+	//	}
+	//	float x = 0.0f;
+	//	float y = 0.0f;
 
-	class Vector2f : public IStringConvertible {
-	public:
-		Vector2f() {}
-		Vector2f(float x_, float y_) : x(x_), y(y_) {
-		}
-		float x = 0.0f;
-		float y = 0.0f;
+	//	int snprint(char *buffer, uint32_t buffersize) const override {
+	//		return snprintf(buffer, buffersize, "(%f, %f)", x, y);
+	//	}
+	//};
 
-		int snprint(char *buffer, uint32_t buffersize) const override {
-			return snprintf(buffer, buffersize, "(%f, %f)", x, y);
-		}
-	};
-
-	class Vector3f : public IStringConvertible {
+	class Vector3f {
 	public:
 		Vector3f() {}
 		Vector3f(float x_, float y_, float z_) : x(x_), y(y_), z(z_) {
+
 		}
 		float x = 0.0f;
 		float y = 0.0f;
 		float z = 0.0f;
-
-		int snprint(char *buffer, uint32_t buffersize) const override {
-			return snprintf(buffer, buffersize, "(%f, %f, %f)", x, y, z);
-		}
 	};
-	class Vector4f : public IStringConvertible {
-	public:
-		Vector4f() {}
-		Vector4f(float x_, float y_, float z_, float w_) : x(x_), y(y_), z(z_), w(w_) {
-		}
-		float x = 0.0f;
-		float y = 0.0f;
-		float z = 0.0f;
-		float w = 0.0f;
+	//class Vector4f : public IStringConvertible {
+	//public:
+	//	Vector4f() {}
+	//	Vector4f(float x_, float y_, float z_, float w_) : x(x_), y(y_), z(z_), w(w_) {
+	//	}
+	//	float x = 0.0f;
+	//	float y = 0.0f;
+	//	float z = 0.0f;
+	//	float w = 0.0f;
 
-		int snprint(char *buffer, uint32_t buffersize) const override {
-			return snprintf(buffer, buffersize, "(%f, %f, %f, %f)", x, y, z, w);
-		}
-	};
+	//	int snprint(char *buffer, uint32_t buffersize) const override {
+	//		return snprintf(buffer, buffersize, "(%f, %f, %f, %f)", x, y, z, w);
+	//	}
+	//};
 
 	class Matrix4x4f {
 	public:
@@ -73,10 +64,6 @@ namespace houdini_alembic {
 		std::array<float, 16> value;
 	};
 
-	using AttributeVector2 = Vector2f;
-	using AttributeVector3 = Vector3f;
-	using AttributeVector4 = Vector4f;
-
 	class AttributeColumn {
 	public:
 		AttributeColumn() {}
@@ -93,57 +80,29 @@ namespace houdini_alembic {
 
 		virtual int snprint(uint32_t index, char *buffer, uint32_t buffersize) const = 0;
 	};
-	template <class T>
-	class AttributeColumnT : public AttributeColumn {
-	public:
-		T get(uint32_t index) const {
-			return rows[index];
-		}
-		uint32_t rowCount() const override {
-			return rows.size();
-		}
-		int snprint(uint32_t index, char *buffer, uint32_t buffersize) const override {
-			const IStringConvertible &convertible = rows[index];
-			return convertible.snprint(buffer, buffersize);
-		}
-		std::vector<T> rows;
-	};
-
-	using AttributeVector2Column = AttributeColumnT<AttributeVector2>;
-	// using AttributeVector3Column = AttributeColumnT<AttributeVector3>;
-	using AttributeVector4Column = AttributeColumnT<AttributeVector4>;
 
 	class AttributeFloatColumn : public AttributeColumn {
 	public:
-		float get(uint32_t index) const {
-			return rows[index];
-		}
-		uint32_t rowCount() const override {
-			return rows.size();
-		}
-		int snprint(uint32_t index, char *buffer, uint32_t buffersize) const override {
-			return snprintf(buffer, buffersize, "%f", rows[index]);
-		}
-		std::vector<float> rows;
+		virtual float get(uint32_t index) const = 0;
 	};
 	class AttributeIntColumn : public AttributeColumn {
 	public:
-		int32_t get(uint32_t index) const {
-			return rows[index];
-		}
-		uint32_t rowCount() const override {
-			return rows.size();
-		}
-		int snprint(uint32_t index, char *buffer, uint32_t buffersize) const override {
-			return snprintf(buffer, buffersize, "%d", rows[index]);
-		}
-		std::vector<int32_t> rows;
+		virtual int32_t get(uint32_t index) const = 0;
 	};
 
+	class AttributeVector2Column : public AttributeColumn {
+	public:
+		virtual void get(uint32_t index, float *xy) const = 0;
+	};
 	class AttributeVector3Column : public AttributeColumn {
 	public:
 		virtual void get(uint32_t index, float *xyz) const = 0;
 	};
+	class AttributeVector4Column : public AttributeColumn {
+	public:
+		virtual void get(uint32_t index, float *xyzw) const = 0;
+	};
+
 	class AttributeStringColumn : public AttributeColumn {
 	public:
 		virtual const std::string &get(uint32_t index) const = 0;
@@ -188,26 +147,23 @@ namespace houdini_alembic {
 		/*
 		get value by key and column. if the key don't exist, a exception will be thrown. No Range Check.
 		*/
-		const std::string &get_as_string(size_t index, const char *key) const {
+		const std::string &get_as_string(uint32_t index, const char *key) const {
 			return get_as_string(key)->get(index);
 		}
-		float get_as_float(size_t index, const char *key) const {
+		float get_as_float(uint32_t index, const char *key) const {
 			return get_as_float(key)->get(index);
 		}
-		int32_t get_as_int(size_t index, const char *key) const {
+		int32_t get_as_int(uint32_t index, const char *key) const {
 			return get_as_int(key)->get(index);
 		}
-		AttributeVector2 get_as_vector2(size_t index, const char *key) const {
-			return get_as_vector2(key)->get(index);
+		void get_as_vector2(uint32_t index, const char *key, float *xy) const {
+			get_as_vector2(key)->get(index, xy);
 		}
-		//AttributeVector3 get_as_vector3(size_t index, const char *key) const {
-		//	return get_as_vector3(key)->get(index);
-		//}
-		void get_as_vector3(size_t index, const char *key, float *xyz) const {
+		void get_as_vector3(uint32_t index, const char *key, float *xyz) const {
 			get_as_vector3(key)->get(index, xyz);
 		}
-		AttributeVector4 get_as_vector4(size_t index, const char *key) const {
-			return get_as_vector4(key)->get(index);
+		void get_as_vector4(uint32_t index, const char *key, float *xyzw) const {
+			get_as_vector4(key)->get(index, xyzw);
 		}
 
 		uint32_t rowCount() const {
@@ -217,7 +173,7 @@ namespace houdini_alembic {
 			return sheet.begin()->second->rowCount();
 		}
 		uint32_t columnCount() const {
-			return sheet.size();
+			return (uint32_t)sheet.size();
 		}
 
 		bool contains_key(const char *key) {

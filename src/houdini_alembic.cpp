@@ -16,7 +16,7 @@ namespace houdini_alembic {
 	inline Matrix4x4f to(M44d m) {
 		Matrix4x4f r;
 		for (int i = 0; i < 16; ++i) {
-			r.value[i] = m.getValue()[i];
+			r.value[i] = (float)m.getValue()[i];
 		}
 		return r;
 	}
@@ -64,34 +64,122 @@ namespace houdini_alembic {
 		return (extent_s == "") ? 1 : atoi(extent_s.c_str());
 	}
 
-	template <int N>
-	class AttributeStraightforwardVectorNColumn : public AttributeVector3Column {
+	class AttributeStraightforwardVector2Column : public AttributeVector2Column {
 	public:
 		enum {
-			DIMENSIONS = N
+			DIMENSIONS = 2
 		};
-		virtual void get(uint32_t index, float *xs) const override {
+		void get(uint32_t index, float *xs) const override {
 			const float *p = _floats->get();
-			uint32_t src_index = index * N;
-			for (int i = 0; i < N; ++i) {
+			uint32_t src_index = index * DIMENSIONS;
+			for (int i = 0; i < DIMENSIONS; ++i) {
 				xs[i] = p[src_index + i];
 			}
 		}
 		uint32_t rowCount() const override {
-			return _floats->size();
+			return _size;
 		}
-
+		int snprint(uint32_t index, char *buffer, uint32_t buffersize) const override {
+			float xs[DIMENSIONS];
+			get(index, xs);
+			return snprintf(buffer, buffersize, "(%f, %f)", xs[0], xs[1]);
+		}
+		uint32_t _size = 0;
 		FloatArraySamplePtr _floats;
 	};
-	class AttributeStraightforwardVector3Column : public AttributeStraightforwardVectorNColumn<3> {
+	class AttributeStraightforwardVector3Column : public AttributeVector3Column {
 	public:
+		enum {
+			DIMENSIONS = 3
+		};
+		void get(uint32_t index, float *xs) const override {
+			const float *p = _floats->get();
+			uint32_t src_index = index * DIMENSIONS;
+			for (int i = 0; i < DIMENSIONS; ++i) {
+				xs[i] = p[src_index + i];
+			}
+		}
+		uint32_t rowCount() const override {
+			return _size;
+		}
 		int snprint(uint32_t index, char *buffer, uint32_t buffersize) const override {
 			float xs[DIMENSIONS];
 			get(index, xs);
 			return snprintf(buffer, buffersize, "(%f, %f, %f)", xs[0], xs[1], xs[2]);
 		}
+		uint32_t _size = 0;
+		FloatArraySamplePtr _floats;
+	};
+	class AttributeStraightforwardVector4Column : public AttributeVector4Column {
+	public:
+		enum {
+			DIMENSIONS = 4
+		};
+		void get(uint32_t index, float *xs) const override {
+			const float *p = _floats->get();
+			uint32_t src_index = index * DIMENSIONS;
+			for (int i = 0; i < DIMENSIONS; ++i) {
+				xs[i] = p[src_index + i];
+			}
+		}
+		uint32_t rowCount() const override {
+			return _size;
+		}
+		int snprint(uint32_t index, char *buffer, uint32_t buffersize) const override {
+			float xs[DIMENSIONS];
+			get(index, xs);
+			return snprintf(buffer, buffersize, "(%f, %f, %f, %f)", xs[0], xs[1], xs[2], xs[3]);
+		}
+		uint32_t _size = 0;
+		FloatArraySamplePtr _floats;
 	};
 
+	class AttributeIndexedVector2Column : public AttributeVector2Column {
+	public:
+		void get(uint32_t index, float *xs) const override {
+			const V2f *vector2 = _indexed_vector2->get();
+			const uint32_t *indices = _indices->get();
+			const V2f &value = vector2[indices[index]];
+			xs[0] = value.x;
+			xs[1] = value.y;
+		}
+		uint32_t rowCount() const override {
+			return (uint32_t)_indices->size();
+		}
+		int snprint(uint32_t index, char *buffer, uint32_t buffersize) const override {
+			float xs[2];
+			get(index, xs);
+			return snprintf(buffer, buffersize, "(%f, %f)", xs[0], xs[1]);
+		}
+		UInt32ArraySamplePtr _indices;
+		V2fArraySamplePtr _indexed_vector2;
+	};
+	class AttributeStraightforwardFloatColumn : public AttributeFloatColumn {
+	public:
+		float get(uint32_t index) const override {
+			return _floats->get()[index];
+		}
+		uint32_t rowCount() const override {
+			return (uint32_t)_floats->size();
+		}
+		int snprint(uint32_t index, char *buffer, uint32_t buffersize) const override {
+			return snprintf(buffer, buffersize, "%f", get(index));
+		}
+		FloatArraySamplePtr _floats;
+	};
+	class AttributeStraightforwardIntColumn : public AttributeIntColumn {
+	public:
+		int32_t get(uint32_t index) const override {
+			return _ints->get()[index];
+		}
+		uint32_t rowCount() const override {
+			return (uint32_t)_ints->size();
+		}
+		int snprint(uint32_t index, char *buffer, uint32_t buffersize) const override {
+			return snprintf(buffer, buffersize, "%d", get(index));
+		}
+		Int32ArraySamplePtr _ints;
+	};
 	class AttributeStraightforwardStringColumn : public AttributeStringColumn {
 	public:
 		const std::string &get(uint32_t index) const override {
@@ -99,7 +187,7 @@ namespace houdini_alembic {
 			return strings[index];
 		}
 		uint32_t rowCount() const override {
-			return _strings->size();
+			return (uint32_t)_strings->size();
 		}
 		int snprint(uint32_t index, char *buffer, uint32_t buffersize) const override {
 			const std::string &value = get(index);
@@ -116,7 +204,7 @@ namespace houdini_alembic {
 			return strings[indices[index]];
 		}
 		uint32_t rowCount() const override {
-			return _indices->size();
+			return (uint32_t)_indices->size();
 		}
 		int snprint(uint32_t index, char *buffer, uint32_t buffersize) const override {
 			const std::string &value = get(index);
@@ -147,20 +235,11 @@ namespace houdini_alembic {
 		} 
 		else if (header->isCompound() && metaData.get("podName") == "float32_t" && metaData.get("podExtent") == "2") {
 			ICompoundProperty string_compound(parent, key);
-			V2fArraySamplePtr values = get_typed_array_property<IV2fArrayProperty>(string_compound, ".vals", selector);
-			auto values_ptr = values->get();
 
-			UInt32ArraySamplePtr indices = get_typed_array_property<IUInt32ArrayProperty>(string_compound, ".indices", selector);
-			auto indices_count = indices->size();
-			auto indices_ptr = indices->get();
-
-			auto attributes = std::shared_ptr<AttributeVector2Column>(new AttributeVector2Column());
-			attributes->rows.reserve(indices_count);
-			for (int i = 0; i < indices_count; ++i) {
-				auto index = indices_ptr[i];
-				auto value = values_ptr[index];
-				attributes->rows.emplace_back(value.x, value.y);
-			}
+			auto attributes = std::shared_ptr<AttributeIndexedVector2Column>(new AttributeIndexedVector2Column());
+			attributes->_indices = get_typed_array_property<IUInt32ArrayProperty>(string_compound, ".indices", selector);
+			attributes->_indexed_vector2 = get_typed_array_property<IV2fArrayProperty>(string_compound, ".vals", selector);
+			
 			attributeColumn = attributes;
 			return true;
 		}
@@ -171,75 +250,54 @@ namespace houdini_alembic {
 		else if (IFloatArrayProperty::matches(*header, kNoMatching)) {
 			// float, vector2, vector3, vector4 handling
 			FloatArraySamplePtr value = get_typed_array_property<IFloatArrayProperty>(parent, key, selector);
-
-			auto value_size = value->size();
-			auto value_ptr = value->get();
 			uint8_t extent = header->getDataType().getExtent();
+			int arrayExtent = getArrayExtent(metaData);
 
-			if (extent == 1) {
-				int arrayExtent = getArrayExtent(metaData);
-				if (value_size % arrayExtent != 0) {
-					throw std::runtime_error("invalid arrayExtent");
-				}
-				if (arrayExtent == 1) {
-					auto attributes = std::shared_ptr<AttributeFloatColumn>(new AttributeFloatColumn());
-					attributes->rows.reserve(value_size);
-					for (int i = 0; i < value_size; ++i) {
-						auto v = value_ptr[i];
-						attributes->rows.emplace_back(v);
-					}
-					attributeColumn = attributes;
-					return true;
-				}
-				else if (arrayExtent == 2) {
-					auto attributes = std::shared_ptr<AttributeVector2Column>(new AttributeVector2Column());
-					auto n = value_size / arrayExtent;
-					attributes->rows.reserve(n);
-					for (int i = 0; i < value_size; i += arrayExtent) {
-						attributes->rows.emplace_back(value_ptr[i], value_ptr[i + 1]);
-					}
-					attributeColumn = attributes;
-					return true;
-				}
-				//else if (arrayExtent == 3) {
-				//	auto attributes = std::shared_ptr<AttributeVector3ColumnNaive>(new AttributeVector3ColumnNaive());
-				//	auto n = value_size / arrayExtent;
-				//	attributes->rows.reserve(n);
-				//	for (int i = 0; i < value_size; i += arrayExtent) {
-				//		attributes->rows.emplace_back(value_ptr[i], value_ptr[i + 1], value_ptr[i + 2]);
-				//	}
-				//	attributeColumn = attributes;
-				//	return true;
-				//}
-				else if (arrayExtent == 4) {
-					auto attributes = std::shared_ptr<AttributeVector4Column>(new AttributeVector4Column());
-					auto n = value_size / arrayExtent;
-					attributes->rows.reserve(n);
-					for (int i = 0; i < value_size; i += arrayExtent) {
-						attributes->rows.emplace_back(value_ptr[i], value_ptr[i + 1], value_ptr[i + 2], value_ptr[i + 3]);
-					}
-					attributeColumn = attributes;
-					return true;
-				}
+			int compornent_size = extent * arrayExtent;
+			int size = 0;
+
+			if (1 < arrayExtent) {
+				size = value->size() / arrayExtent;
 			}
-			else if (extent == 3) {
-				auto attributes = std::shared_ptr<AttributeStraightforwardVector3Column>(new AttributeStraightforwardVector3Column());
+			else {
+				size = value->size();
+			}
+			switch (compornent_size)
+			{
+			case 1: {
+				auto attributes = std::shared_ptr<AttributeStraightforwardFloatColumn>(new AttributeStraightforwardFloatColumn());
 				attributes->_floats = value;
 				attributeColumn = attributes;
 				return true;
 			}
+			case 2: {
+				auto attributes = std::shared_ptr<AttributeStraightforwardVector2Column>(new AttributeStraightforwardVector2Column());
+				attributes->_floats = value;
+				attributes->_size = size;
+				attributeColumn = attributes;
+				return true;
+			}
+			case 3: {
+				auto attributes = std::shared_ptr<AttributeStraightforwardVector3Column>(new AttributeStraightforwardVector3Column());
+				attributes->_floats = value;
+				attributes->_size = size;
+				attributeColumn = attributes;
+				return true;
+			}
+			case 4: {
+				auto attributes = std::shared_ptr<AttributeStraightforwardVector4Column>(new AttributeStraightforwardVector4Column());
+				attributes->_floats = value;
+				attributes->_size = size;
+				attributeColumn = attributes;
+				return true;
+			}
+			default:
+				break;
+			}
 		}
 		else if (IInt32ArrayProperty::matches(*header)) {
-			Int32ArraySamplePtr value = get_typed_array_property<IInt32ArrayProperty>(parent, key, selector);
-			auto value_size = value->size();
-			auto value_ptr = value->get();
-
-			auto attributes = std::shared_ptr<AttributeIntColumn>(new AttributeIntColumn());
-			attributes->rows.reserve(value_size);
-			for (int i = 0; i < value_size; ++i) {
-				auto v = value_ptr[i];
-				attributes->rows.emplace_back(v);
-			}
+			auto attributes = std::shared_ptr<AttributeStraightforwardIntColumn>(new AttributeStraightforwardIntColumn());
+			attributes->_ints = get_typed_array_property<IInt32ArrayProperty>(parent, key, selector);
 			attributeColumn = attributes;
 			return true;
 		}

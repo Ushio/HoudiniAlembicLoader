@@ -388,12 +388,14 @@ inline void drawAlembicPolygon(std::shared_ptr<houdini_alembic::PolygonMeshObjec
 			mesh.addIndex(index);
 		}
 
-		//if (polygon->points.contains_key("Cd")) {
-		//	auto Cd = polygon->points.get_as_vector3("Cd");
-		//	for (auto color : Cd->rows) {
-		//		mesh.addColor(ofFloatColor(color.x, color.y, color.z));
-		//	}
-		//}
+		if (polygon->points.contains_key("Cd")) {
+			auto Cd = polygon->points.get_as_vector3("Cd");
+			for (int i = 0; i < Cd->rowCount() ; ++i) {
+				glm::vec3 p;
+				Cd->get(i, glm::value_ptr(p));
+				mesh.addColor(ofFloatColor(p.x, p.y, p.z));
+			}
+		}
 
 		ofPushMatrix();
 		ofMultMatrix(polygon->combinedXforms.value_ptr());
