@@ -4,6 +4,8 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl2.h"
 
+#include "unit_test.hpp"
+
 template <class T>
 void imgui_tree(const char *name, bool isOpen, T f) {
 	if (isOpen) {
@@ -320,6 +322,8 @@ inline void show_houdini_alembic(std::shared_ptr<houdini_alembic::AlembicScene> 
 
 //--------------------------------------------------------------
 void ofApp::setup() {
+	// run_unit_test();
+
 	// setup ImGui
 	ImGui::CreateContext();
 
@@ -338,8 +342,7 @@ void ofApp::setup() {
 
 	_camera_model.load("camera_model.ply");
 
-
-	open_alembic(ofToDataPath("example2.abc"));
+	open_alembic(ofToDataPath("example1.abc"));
 
 	ofSetVerticalSync(false);
 }
@@ -375,18 +378,35 @@ inline void drawAlembicPolygon(std::shared_ptr<houdini_alembic::PolygonMeshObjec
 
 	if (isTriangleMesh) {
 		static ofMesh mesh;
+		static ofMesh normalMesh;
 		mesh.clear();
 		mesh.setMode(OF_PRIMITIVE_TRIANGLES);
+
+		normalMesh.clear();
+		normalMesh.setMode(OF_PRIMITIVE_LINES);
 
 		int rowCount = P_Column->rowCount();
 		for (int i = 0; i < rowCount; ++i) {
 			glm::vec3 p;
 			P_Column->get(i, glm::value_ptr(p));
-			mesh.addVertex(glm::vec3(p));
+			mesh.addVertex(p);
 		}
 
 		for (auto index : polygon->indices) {
 			mesh.addIndex(index);
+		}
+
+		if (auto N = polygon->points.column_as_vector3("N")) {
+			for (int i = 0; i < N->rowCount(); ++i) {
+				glm::vec3 p;
+				P_Column->get(i, glm::value_ptr(p));
+				
+				glm::vec3 n;
+				N->get(i, glm::value_ptr(n));
+				
+				normalMesh.addVertex(p);
+				normalMesh.addVertex(p + n * 0.1);
+			}
 		}
 
 		if (auto Cd = polygon->points.column_as_vector3("Cd")) {
@@ -406,6 +426,9 @@ inline void drawAlembicPolygon(std::shared_ptr<houdini_alembic::PolygonMeshObjec
 
 		ofSetColor(128);
 		mesh.draw();
+
+		ofSetColor(128, 128, 255);
+		normalMesh.draw();
 
 		glEnable(GL_POLYGON_OFFSET_LINE);
 		glPolygonOffset(-0.1f, 1.0f);
@@ -528,6 +551,13 @@ void ofApp::draw() {
 					show_houdini_alembic(_scene);
 					ImGui::EndTabItem();
 				}
+			}
+			if (ImGui::BeginTabItem("Unit Test"))
+			{
+				if (ImGui::Button("Run", ImVec2(100, 30))) {
+					run_unit_test();
+				}
+				ImGui::EndTabItem();
 			}
 			ImGui::EndTabBar();
 		}

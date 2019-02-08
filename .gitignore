@@ -98,3 +98,4 @@ Desktop.ini
 !vcomp120.dll
 
 bin/data/backup/
+bin/data/test_case/backup/

@@ -189,6 +189,7 @@
     <ClCompile Include="src\imgui-1.67\imgui_widgets.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
+    <ClCompile Include="src\unit_test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\houdini_alembic.hpp" />
@@ -201,6 +202,7 @@
     <ClInclude Include="src\imgui-1.67\imstb_textedit.h" />
     <ClInclude Include="src\imgui-1.67\imstb_truetype.h" />
     <ClInclude Include="src\ofApp.h" />
+    <ClInclude Include="src\unit_test.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">

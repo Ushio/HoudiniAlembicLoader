@@ -28,6 +28,9 @@
     <ClCompile Include="src\houdini_alembic.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\unit_test.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -66,6 +69,9 @@
       <Filter>src\imgui-1.67</Filter>
     </ClInclude>
     <ClInclude Include="src\houdini_alembic.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\unit_test.hpp">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
