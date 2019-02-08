@@ -246,7 +246,7 @@ inline void show_sheet(const houdini_alembic::AttributeSpreadSheet &sheet) {
 	ImGui::Columns(sheet.columnCount(), "sheet");
 	ImGui::Separator();
 	for (auto col : sheet.sheet) {
-		ImGui::Text("%s", col.first.c_str()); ImGui::NextColumn();
+		ImGui::Text("%s (%s)", col.key.c_str(), houdini_alembic::attributeTypeString(col.column->attributeType())); ImGui::NextColumn();
 	}
 	ImGui::Separator();
 
@@ -254,7 +254,7 @@ inline void show_sheet(const houdini_alembic::AttributeSpreadSheet &sheet) {
 	bool breaked = false;
 	for (int i = 0; i < sheet.rowCount(); i++) {
 		for (auto col : sheet.sheet) {
-			col.second->snprint(i, buffer, sizeof(buffer));
+			col.column->snprint(i, buffer, sizeof(buffer));
 			ImGui::Text("%s", buffer);
 			ImGui::NextColumn();
 		}
@@ -338,6 +338,7 @@ void ofApp::setup() {
 
 	_camera_model.load("camera_model.ply");
 
+
 	open_alembic(ofToDataPath("example2.abc"));
 
 	ofSetVerticalSync(false);
@@ -368,7 +369,7 @@ void ofApp::update() {
 }
 
 inline void drawAlembicPolygon(std::shared_ptr<houdini_alembic::PolygonMeshObject> polygon) {
-	auto P_Column = polygon->points.get_as_vector3("P");
+	auto P_Column = polygon->points.column_as_vector3("P");
 
 	bool isTriangleMesh = std::all_of(polygon->faceCounts.begin(), polygon->faceCounts.end(), [](int32_t f) { return f == 3; });
 
@@ -388,8 +389,7 @@ inline void drawAlembicPolygon(std::shared_ptr<houdini_alembic::PolygonMeshObjec
 			mesh.addIndex(index);
 		}
 
-		if (polygon->points.contains_key("Cd")) {
-			auto Cd = polygon->points.get_as_vector3("Cd");
+		if (auto Cd = polygon->points.column_as_vector3("Cd")) {
 			for (int i = 0; i < Cd->rowCount() ; ++i) {
 				glm::vec3 p;
 				Cd->get(i, glm::value_ptr(p));

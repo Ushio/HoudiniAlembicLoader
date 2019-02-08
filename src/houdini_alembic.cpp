@@ -338,13 +338,13 @@ namespace houdini_alembic {
 				std::string geoScope;
 				if (parse_attributes(compound_prop, key, selector, attributes, geoScope)) {
 					if (geoScope == "var" || geoScope == "vtx") {
-						polymeshObject->points.sheet[key] = attributes;
+						polymeshObject->points.sheet.emplace_back(key , attributes);
 					}
 					else if (geoScope == "fvr") {
-						polymeshObject->vertices.sheet[key] = attributes;
+						polymeshObject->vertices.sheet.emplace_back(key, attributes);
 					}
 					else if (geoScope == "uni") {
-						polymeshObject->primitives.sheet[key] = attributes;
+						polymeshObject->primitives.sheet.emplace_back(key, attributes);
 					}
 				}
 			}
@@ -353,6 +353,10 @@ namespace houdini_alembic {
 		// 
 		process_attributes(ICompoundProperty(polyMesh.getProperties(), ".geom"));
 		process_attributes(schema.getArbGeomParams());
+
+		std::sort(polymeshObject->points.sheet.begin(), polymeshObject->points.sheet.end());
+		std::sort(polymeshObject->vertices.sheet.begin(), polymeshObject->vertices.sheet.end());
+		std::sort(polymeshObject->primitives.sheet.begin(), polymeshObject->primitives.sheet.end());
 	}
 
 	static void parse_object(IObject o, ISampleSelector selector, std::vector<M44d> xforms, std::vector<std::shared_ptr<SceneObject>> &objects) {

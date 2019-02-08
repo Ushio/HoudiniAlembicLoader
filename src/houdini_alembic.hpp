@@ -64,6 +64,26 @@ namespace houdini_alembic {
 		std::array<float, 16> value;
 	};
 
+	enum AttributeType {
+		AttributeType_Int = 0,
+		AttributeType_Float,
+		AttributeType_Vector2,
+		AttributeType_Vector3,
+		AttributeType_Vector4,
+		AttributeType_String,
+	};
+	inline const char *attributeTypeString(AttributeType type) {
+		static const char *types[] = {
+			"Int",
+			"Float",
+			"Vector2",
+			"Vector3",
+			"Vector4",
+			"String",
+		};
+		return types[type];
+	}
+
 	class AttributeColumn {
 	public:
 		AttributeColumn() {}
@@ -71,115 +91,119 @@ namespace houdini_alembic {
 		void operator=(const AttributeColumn &) = delete;
 
 		virtual ~AttributeColumn() {}
+		virtual AttributeType attributeType() const = 0;
 		virtual uint32_t rowCount() const = 0;
-
-		template <class T>
-		bool IsAssignableTo() const {
-			return dynamic_cast<T *>(this) != null;
-		}
 
 		virtual int snprint(uint32_t index, char *buffer, uint32_t buffersize) const = 0;
 	};
 
 	class AttributeFloatColumn : public AttributeColumn {
 	public:
+		AttributeType attributeType() const override {
+			return AttributeType_Float;
+		}
 		virtual float get(uint32_t index) const = 0;
 	};
 	class AttributeIntColumn : public AttributeColumn {
 	public:
+		AttributeType attributeType() const override {
+			return AttributeType_Int;
+		}
 		virtual int32_t get(uint32_t index) const = 0;
 	};
 
 	class AttributeVector2Column : public AttributeColumn {
 	public:
+		AttributeType attributeType() const override {
+			return AttributeType_Vector2;
+		}
 		virtual void get(uint32_t index, float *xy) const = 0;
 	};
 	class AttributeVector3Column : public AttributeColumn {
 	public:
+		AttributeType attributeType() const override {
+			return AttributeType_Vector3;
+		}
 		virtual void get(uint32_t index, float *xyz) const = 0;
 	};
 	class AttributeVector4Column : public AttributeColumn {
 	public:
+		AttributeType attributeType() const override {
+			return AttributeType_Vector4;
+		}
 		virtual void get(uint32_t index, float *xyzw) const = 0;
 	};
 
 	class AttributeStringColumn : public AttributeColumn {
 	public:
+		AttributeType attributeType() const override {
+			return AttributeType_String;
+		}
 		virtual const std::string &get(uint32_t index) const = 0;
 	};
 
 	class AttributeSpreadSheet {
+		template <class T>
+		const T *column_as(const char *key) const {
+			return dynamic_cast<const T *>(column(key));
+		}
 	public:
-		template <class TColumn>
-		std::shared_ptr<TColumn> get_as(const char *key) const {
-			auto it = sheet.find(key);
-			if (it == sheet.end()) {
-				throw std::runtime_error("[SpreadSheet] key not found.");
-			}
-			auto col = std::dynamic_pointer_cast<TColumn>(it->second);
-			if (!col) {
-				throw std::runtime_error("[SpreadSheet] value type mismatch");
-			}
-			return col;
+		const AttributeStringColumn *column_as_string(const char *key) const {
+			return column_as<AttributeStringColumn>(key);
 		}
-		/*
-		get column by key. if the key don't exist, a exception will be thrown.
-		*/
-		std::shared_ptr<AttributeStringColumn> get_as_string(const char *key) const {
-			return get_as<AttributeStringColumn>(key);
+		const AttributeFloatColumn *column_as_float(const char *key) const {
+			return column_as<AttributeFloatColumn>(key);
 		}
-		std::shared_ptr<AttributeFloatColumn> get_as_float(const char *key) const {
-			return get_as<AttributeFloatColumn>(key);
+		const AttributeIntColumn *column_as_int(const char *key) const {
+			return column_as<AttributeIntColumn>(key);
 		}
-		std::shared_ptr<AttributeIntColumn> get_as_int(const char *key) const {
-			return get_as<AttributeIntColumn>(key);
+		const AttributeVector2Column *column_as_vector2(const char *key) const {
+			return column_as<AttributeVector2Column>(key);
 		}
-		std::shared_ptr<AttributeVector2Column> get_as_vector2(const char *key) const {
-			return get_as<AttributeVector2Column>(key);
+		const AttributeVector3Column *column_as_vector3(const char *key) const {
+			return column_as<AttributeVector3Column>(key);
 		}
-		std::shared_ptr<AttributeVector3Column> get_as_vector3(const char *key) const {
-			return get_as<AttributeVector3Column>(key);
-		}
-		std::shared_ptr<AttributeVector4Column> get_as_vector4(const char *key) const {
-			return get_as<AttributeVector4Column>(key);
-		}
-
-		/*
-		get value by key and column. if the key don't exist, a exception will be thrown. No Range Check.
-		*/
-		const std::string &get_as_string(uint32_t index, const char *key) const {
-			return get_as_string(key)->get(index);
-		}
-		float get_as_float(uint32_t index, const char *key) const {
-			return get_as_float(key)->get(index);
-		}
-		int32_t get_as_int(uint32_t index, const char *key) const {
-			return get_as_int(key)->get(index);
-		}
-		void get_as_vector2(uint32_t index, const char *key, float *xy) const {
-			get_as_vector2(key)->get(index, xy);
-		}
-		void get_as_vector3(uint32_t index, const char *key, float *xyz) const {
-			get_as_vector3(key)->get(index, xyz);
-		}
-		void get_as_vector4(uint32_t index, const char *key, float *xyzw) const {
-			get_as_vector4(key)->get(index, xyzw);
+		const AttributeVector4Column *column_as_vector4(const char *key) const {
+			return column_as<AttributeVector4Column>(key);
 		}
 
 		uint32_t rowCount() const {
 			if (sheet.empty()) {
 				return 0;
 			}
-			return sheet.begin()->second->rowCount();
+			return sheet[0].column->rowCount();
 		}
 		uint32_t columnCount() const {
 			return (uint32_t)sheet.size();
 		}
 
-		bool contains_key(const char *key) {
-			return sheet.count(key) != 0;
+		const AttributeColumn *column(const char *key) const {
+			auto it = std::lower_bound(sheet.begin(), sheet.end(), key, [](const char *a, const char *b) { 
+				return strcmp(a, b) < 0; 
+			});
+			if (it == sheet.end()) {
+				return nullptr;
+			}
+			if (strcmp(it->key.c_str(), key) != 0) {
+				return nullptr;
+			}
+			return it->column.get();
 		}
-		std::map<std::string, std::shared_ptr<AttributeColumn>> sheet;
+
+		struct Attribute {
+			Attribute() {}
+			Attribute(std::string k, std::shared_ptr<AttributeColumn> c) : key(k), column(c) {}
+			std::string key;
+			std::shared_ptr<AttributeColumn> column;
+
+			operator const char *() const {
+				return key.c_str();
+			}
+			bool operator<(const Attribute &rhs) const {
+				return key < rhs.key;
+			}
+		};
+		std::vector<Attribute> sheet;
 	};
 
 	enum SceneObjectType {
