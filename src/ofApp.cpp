@@ -302,20 +302,20 @@ inline void show_camera(std::shared_ptr<houdini_alembic::CameraObject> camera) {
 	ImGui::Text("resolution_x : %d", camera->resolution_x);
 	ImGui::Text("resolution_y : %d", camera->resolution_y);
 	ImGui::Separator();
-	ImGui::Text("Focal Length : %.1f mm", camera->focalLength_mm);
-	ImGui::Text("Aperture H : %.1f mm", camera->aperture_horizontal_mm);
-	ImGui::Text("Aperture V : %.1f mm", camera->aperture_vertical_mm);
+	ImGui::Text("Focal Length : %.3f mm", camera->focalLength_mm);
+	ImGui::Text("Aperture H : %.3f mm", camera->aperture_horizontal_mm);
+	ImGui::Text("Aperture V : %.3f mm", camera->aperture_vertical_mm);
 	ImGui::Text("Near Clip : %.3f", camera->nearClip);
 	ImGui::Text("Far  Clip : %.3f", camera->farClip);
 	ImGui::Separator();
 	ImGui::Text("Focus Distance : %.3f", camera->focusDistance);
 	ImGui::Text("F-Stop : %.3f", camera->f_stop);
 	ImGui::Separator();
-	ImGui::Text("fov horizontal : %.1f deg", camera->fov_horizontal_degree);
-	ImGui::Text("fov vertical   : %.1f deg", camera->fov_vertical_degree);
-	ImGui::Text("Lens Radius : %.1f", camera->lensRadius);
-	ImGui::Text("Object Plane Width  : %.1f", camera->objectPlaneWidth);
-	ImGui::Text("Object Plane Height : %.1f", camera->objectPlaneHeight);
+	ImGui::Text("fov horizontal : %.3f deg", camera->fov_horizontal_degree);
+	ImGui::Text("fov vertical   : %.3f deg", camera->fov_vertical_degree);
+	ImGui::Text("Lens Radius : %.3f", camera->lensRadius);
+	ImGui::Text("Object Plane Width  : %.3f", camera->objectPlaneWidth);
+	ImGui::Text("Object Plane Height : %.3f", camera->objectPlaneHeight);
 }
 inline void show_houdini_alembic(std::shared_ptr<houdini_alembic::AlembicScene> scene) {
 	if (!scene) {
