@@ -1,4 +1,6 @@
 ## Houdini Alembic Loader with Custom Attributes
+- Read Custom Attributes (Polygon)
+- Read Camera Parameters
 
 ## Dependencies
 - bopenframeworks (0.10.1)
@@ -11,7 +13,5 @@ vcpkg install alembic:x64-windows
 ![demo](demo.gif)
 
 ## TODO
-- Camera Attributes
 - Details Attributes
-- String Optimization
 - Code Example

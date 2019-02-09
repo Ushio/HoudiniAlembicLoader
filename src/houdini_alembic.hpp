@@ -254,9 +254,37 @@ namespace houdini_alembic {
 		Vector3f eye;
 		Vector3f lookat;
 		Vector3f up;
-		int imageWidth = 0;
-		int imageHeight = 0;
+		Vector3f down;
+		Vector3f forward;
+		Vector3f back;
+		Vector3f left;
+		Vector3f right;
 
+		/*
+		 Houdini Parameters [ View ]
+		*/
+		int resolution_x = 0; /* Resolution x */
+		int resolution_y = 0; /* Resolution y */
+		float focalLength_mm = 50.0f; /* Focal Length */
+		float aperture_horizontal_mm = 41.4214; /* Aperture */
+		float aperture_vertical_mm = 0;
+		float nearClip = 0.001f;
+		float farClip = 10000.0f;
+
+		/*
+		 Houdini Parameters [ Sampling ]
+		*/
+		float focusDistance = 0.0f;
+		float f_stop = 5.6f;
+
+		/*
+		 Calculated by Parameters
+		*/
+		float fov_horizontal_degree = 45.0f;
+		float fov_vertical_degree = 45.0f;
+		float lensRadius = 0.0f;
+		float objectPlaneWidth = 0.0f;
+		float objectPlaneHeight = 0.0f;
 
 	};
 	class AlembicScene {

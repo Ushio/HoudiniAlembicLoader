@@ -299,8 +299,23 @@ inline void show_polygon_sheet(std::shared_ptr<houdini_alembic::PolygonMeshObjec
 inline void show_camera(std::shared_ptr<houdini_alembic::CameraObject> camera) {
 	ImGui::Text("[CameraObject]");
 
-	ImGui::Text("imageWidth : %d", camera->imageWidth);
-	ImGui::Text("imageHeight: %d", camera->imageHeight);
+	ImGui::Text("resolution_x : %d", camera->resolution_x);
+	ImGui::Text("resolution_y : %d", camera->resolution_y);
+	ImGui::Separator();
+	ImGui::Text("Focal Length : %.1f mm", camera->focalLength_mm);
+	ImGui::Text("Aperture H : %.1f mm", camera->aperture_horizontal_mm);
+	ImGui::Text("Aperture V : %.1f mm", camera->aperture_vertical_mm);
+	ImGui::Text("Near Clip : %.3f", camera->nearClip);
+	ImGui::Text("Far  Clip : %.3f", camera->farClip);
+	ImGui::Separator();
+	ImGui::Text("Focus Distance : %.3f", camera->focusDistance);
+	ImGui::Text("F-Stop : %.3f", camera->f_stop);
+	ImGui::Separator();
+	ImGui::Text("fov horizontal : %.1f deg", camera->fov_horizontal_degree);
+	ImGui::Text("fov vertical   : %.1f deg", camera->fov_vertical_degree);
+	ImGui::Text("Lens Radius : %.1f", camera->lensRadius);
+	ImGui::Text("Object Plane Width  : %.1f", camera->objectPlaneWidth);
+	ImGui::Text("Object Plane Height : %.1f", camera->objectPlaneHeight);
 }
 inline void show_houdini_alembic(std::shared_ptr<houdini_alembic::AlembicScene> scene) {
 	if (!scene) {
@@ -448,8 +463,28 @@ inline void drawAlembicCamera(std::shared_ptr<houdini_alembic::CameraObject> cam
 	camera_model.drawWireframe();
 	ofDrawAxis(0.5f);
 	ofPopMatrix();
+
+	auto to = [](houdini_alembic::Vector3f p) {
+		return glm::vec3(p.x, p.y, p.z);
+	};
+
+	glm::vec3 object_center = to(camera->eye) + to(camera->forward) * camera->focusDistance;
+
+	glm::vec3 o = object_center + to(camera->left) * camera->objectPlaneWidth * 0.5f + to(camera->up) * camera->objectPlaneHeight * 0.5f;
+	glm::vec3 object_vertices[] = {
+		o,
+		o + to(camera->right) * camera->objectPlaneWidth,
+		o + to(camera->right) * camera->objectPlaneWidth + to(camera->down) * camera->objectPlaneHeight,
+		o + to(camera->down) * camera->objectPlaneHeight,
+	};
+
+	ofSetColor(200);
+	for (int i = 0; i < 4; ++i) {
+		ofDrawLine(object_vertices[i], object_vertices[(i + 1) % 4]);
+		ofDrawLine(to(camera->eye), to(camera->eye) + (object_vertices[i] - to(camera->eye)) * 3.0f);
+	}
 }
-inline void drawAlembicScene(std::shared_ptr<houdini_alembic::AlembicScene> scene, ofMesh &camera_model) {
+inline void drawAlembicScene(std::shared_ptr<houdini_alembic::AlembicScene> scene, ofMesh &camera_model, bool draw_camera) {
 	for (auto o : scene->objects) {
 		if (o->visible == false) {
 			continue;
@@ -458,7 +493,7 @@ inline void drawAlembicScene(std::shared_ptr<houdini_alembic::AlembicScene> scen
 			auto polygon = std::dynamic_pointer_cast<houdini_alembic::PolygonMeshObject>(o);
 			drawAlembicPolygon(polygon);
 		}
-		else if (o->type() == houdini_alembic::SceneObjectType_Camera) {
+		else if (o->type() == houdini_alembic::SceneObjectType_Camera && draw_camera) {
 			auto camera = std::dynamic_pointer_cast<houdini_alembic::CameraObject>(o);
 			drawAlembicCamera(camera, camera_model);
 		}
@@ -470,7 +505,29 @@ void ofApp::draw() {
 	static int sample_index = 0;
 	static bool hide_ui = false;
 	static bool hide_model = false;
-	static bool loading = true;
+
+	static bool camera_sync = false;
+
+	if (camera_sync && _scene)
+	{
+		for (auto o : _scene->objects) {
+			if (o->visible == false) {
+				continue;
+			}
+
+			if (o->type() == houdini_alembic::SceneObjectType_Camera) {
+				auto camera = std::dynamic_pointer_cast<houdini_alembic::CameraObject>(o);
+				ofSetWindowShape(camera->resolution_x, camera->resolution_y);
+				_camera.setPosition(camera->eye.x, camera->eye.y, camera->eye.z);
+				_camera.lookAt(
+					glm::vec3(camera->lookat.x, camera->lookat.y, camera->lookat.z),
+					glm::vec3(camera->up.x, camera->up.y, camera->up.z)
+				);
+				_camera.setFov(camera->fov_vertical_degree);
+				break;
+			}
+		}
+	}
 
 	ofEnableDepthTest();
 
@@ -490,16 +547,14 @@ void ofApp::draw() {
 	if (_storage.isOpened()) {
 		std::string error_message;
 
-		if (loading) {
-			_scene = _storage.read(sample_index, error_message);
-			if (!_scene) {
-				printf("sample error_message: %s\n", error_message.c_str());
-			}
+		_scene = _storage.read(sample_index, error_message);
+		if (!_scene) {
+			printf("sample error_message: %s\n", error_message.c_str());
 		}
 	}
 
 	if (_scene && hide_model == false) {
-		drawAlembicScene(_scene, _camera_model);
+		drawAlembicScene(_scene, _camera_model, camera_sync == false /*draw camera*/);
 	}
 
 	_camera.end();
@@ -532,8 +587,10 @@ void ofApp::draw() {
 
 	ImGui::Checkbox("hide ui", &hide_ui);
 	ImGui::Checkbox("hide model", &hide_model);
-	ImGui::Checkbox("loading", &loading);
 	
+	ImGui::Spacing();
+	ImGui::Checkbox("camera sync", &camera_sync);
+
 	if (hide_ui == false) {
 		if (ImGui::BeginTabBar("Alembic", ImGuiTabBarFlags_None))
 		{
