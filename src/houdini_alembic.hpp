@@ -118,6 +118,7 @@ namespace houdini_alembic {
 			return AttributeType_Vector2;
 		}
 		virtual void get(uint32_t index, float *xy) const = 0;
+		virtual void get(uint32_t index, double *xy) const = 0;
 	};
 	class AttributeVector3Column : public AttributeColumn {
 	public:
@@ -125,6 +126,7 @@ namespace houdini_alembic {
 			return AttributeType_Vector3;
 		}
 		virtual void get(uint32_t index, float *xyz) const = 0;
+		virtual void get(uint32_t index, double *xyz) const = 0;
 	};
 	class AttributeVector4Column : public AttributeColumn {
 	public:
@@ -132,6 +134,7 @@ namespace houdini_alembic {
 			return AttributeType_Vector4;
 		}
 		virtual void get(uint32_t index, float *xyzw) const = 0;
+		virtual void get(uint32_t index, double *xyzw) const = 0;
 	};
 
 	class AttributeStringColumn : public AttributeColumn {

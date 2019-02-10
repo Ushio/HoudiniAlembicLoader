@@ -76,6 +76,13 @@ namespace houdini_alembic {
 				xs[i] = p[src_index + i];
 			}
 		}
+		virtual void get(uint32_t index, double *xs) const override {
+			const float *p = _floats->get();
+			uint32_t src_index = index * DIMENSIONS;
+			for (int i = 0; i < DIMENSIONS; ++i) {
+				xs[i] = (double)p[src_index + i];
+			}
+		}
 		uint32_t rowCount() const override {
 			return _size;
 		}
@@ -97,6 +104,13 @@ namespace houdini_alembic {
 			uint32_t src_index = index * DIMENSIONS;
 			for (int i = 0; i < DIMENSIONS; ++i) {
 				xs[i] = p[src_index + i];
+			}
+		}
+		virtual void get(uint32_t index, double *xs) const override {
+			const float *p = _floats->get();
+			uint32_t src_index = index * DIMENSIONS;
+			for (int i = 0; i < DIMENSIONS; ++i) {
+				xs[i] = (double)p[src_index + i];
 			}
 		}
 		uint32_t rowCount() const override {
@@ -122,6 +136,13 @@ namespace houdini_alembic {
 				xs[i] = p[src_index + i];
 			}
 		}
+		virtual void get(uint32_t index, double *xs) const override {
+			const float *p = _floats->get();
+			uint32_t src_index = index * DIMENSIONS;
+			for (int i = 0; i < DIMENSIONS; ++i) {
+				xs[i] = (double)p[src_index + i];
+			}
+		}
 		uint32_t rowCount() const override {
 			return _size;
 		}
@@ -137,6 +158,13 @@ namespace houdini_alembic {
 	class AttributeIndexedVector2Column : public AttributeVector2Column {
 	public:
 		void get(uint32_t index, float *xs) const override {
+			const V2f *vector2 = _indexed_vector2->get();
+			const uint32_t *indices = _indices->get();
+			const V2f &value = vector2[indices[index]];
+			xs[0] = value.x;
+			xs[1] = value.y;
+		}
+		virtual void get(uint32_t index, double *xs) const override {
 			const V2f *vector2 = _indexed_vector2->get();
 			const uint32_t *indices = _indices->get();
 			const V2f &value = vector2[indices[index]];
