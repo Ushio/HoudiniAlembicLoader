@@ -211,6 +211,7 @@ namespace houdini_alembic {
 
 	enum SceneObjectType {
 		SceneObjectType_PolygonMesh,
+		SceneObjectType_Point,
 		SceneObjectType_Camera,
 	};
 	class SceneObject {
@@ -249,6 +250,16 @@ namespace houdini_alembic {
 		AttributeSpreadSheet vertices;
 		AttributeSpreadSheet primitives;
 	};
+	class PointObject : public SceneObject {
+	public:
+		SceneObjectType type() const override {
+			return SceneObjectType_Point;
+		}
+
+		std::vector<uint64_t> pointIds;
+		AttributeSpreadSheet points;
+	};
+	
 	class CameraObject : public SceneObject {
 	public:
 		SceneObjectType type() const override {

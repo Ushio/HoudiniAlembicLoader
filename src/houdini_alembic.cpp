@@ -387,6 +387,47 @@ namespace houdini_alembic {
 		std::sort(polymeshObject->primitives.sheet.begin(), polymeshObject->primitives.sheet.end());
 	}
 
+	inline void parse_points(IPoints points, std::shared_ptr<PointObject> pointObject, ISampleSelector selector) {
+		auto schema = points.getSchema();
+		IPointsSchema::Sample sample;
+		schema.get(sample, selector);
+
+		auto pointIds = sample.getIds();
+		pointObject->pointIds = std::vector<uint64_t>(pointIds->get(), pointIds->get() + pointIds->size());
+
+		auto process_attributes = [pointObject, selector](ICompoundProperty compound_prop) {
+			for (int i = 0; i < compound_prop.getNumProperties(); ++i) {
+				auto child_header = compound_prop.getPropertyHeader(i);
+				auto key = child_header.getName();
+				if (key.size() == 0) {
+					continue;
+				}
+				if (key[0] == '.') {
+					continue;
+				}
+
+				std::shared_ptr<AttributeColumn> attributes;
+				std::string geoScope;
+				if (parse_attributes(compound_prop, key, selector, attributes, geoScope)) {
+					if (geoScope == "var" || geoScope == "vtx") {
+						pointObject->points.sheet.emplace_back(key, attributes);
+					}
+					else if (geoScope == "fvr") {
+						// NOP
+					}
+					else if (geoScope == "uni") {
+						// NOP
+					}
+				}
+			}
+		};
+		// 
+		process_attributes(ICompoundProperty(points.getProperties(), ".geom"));
+		process_attributes(schema.getArbGeomParams());
+
+		std::sort(pointObject->points.sheet.begin(), pointObject->points.sheet.end());
+	}
+
 	static void parse_object(IObject o, ISampleSelector selector, std::vector<M44d> xforms, std::vector<std::shared_ptr<SceneObject>> &objects) {
 		auto header = o.getHeader();
 		std::string fullname = header.getFullName();
@@ -404,6 +445,32 @@ namespace houdini_alembic {
 			object->combinedXforms = to(combine_xform(xforms));
 			
 			parse_polymesh(polyMesh, object, selector);
+
+			// http://www.sidefx.com/ja/docs/houdini/io/alembic.html#%E5%8F%AF%E8%A6%96%E6%80%A7
+			auto parentProp = parentXForm.getProperties();
+			if (parentProp.getPropertyHeader("visible")) {
+				int8_t visible = get_typed_scalar_property<ICharProperty>(parentProp, "visible", selector);
+				object->visible = visible == -1;
+			}
+			else {
+				object->visible = true;
+			}
+
+			objects.push_back(object);
+		}
+		else if (IPoints::matches(header)) {
+			IPoints points(o);
+			std::shared_ptr<PointObject> object(new PointObject());
+
+			IXform parentXForm(o.getParent());
+			object->name = parentXForm.getFullName();
+
+			for (int i = 0; i < xforms.size(); ++i) {
+				object->xforms.push_back(to(xforms[i]));
+			}
+			object->combinedXforms = to(combine_xform(xforms));
+
+			parse_points(points, object, selector);
 
 			// http://www.sidefx.com/ja/docs/houdini/io/alembic.html#%E5%8F%AF%E8%A6%96%E6%80%A7
 			auto parentProp = parentXForm.getProperties();
