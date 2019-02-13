@@ -4,7 +4,7 @@
 #include "houdini_alembic.hpp"
 
 const float kNormalLength = 0.1f;
-const ofColor kNormalColor = ofColor(128, 128, 255);
+const ofColor kNormalColor = ofColor(32, 32, 255);
 
 inline void drawAlembicPolygon(const houdini_alembic::PolygonMeshObject *polygon) {
 	auto P_Column = polygon->points.column_as_vector3("P");
@@ -31,6 +31,7 @@ inline void drawAlembicPolygon(const houdini_alembic::PolygonMeshObject *polygon
 			mesh.addIndex(index);
 		}
 
+		// Point Normal
 		if (auto N = polygon->points.column_as_vector3("N")) {
 			for (int i = 0; i < N->rowCount(); ++i) {
 				glm::vec3 p;
@@ -41,6 +42,34 @@ inline void drawAlembicPolygon(const houdini_alembic::PolygonMeshObject *polygon
 
 				normalMesh.addVertex(p);
 				normalMesh.addVertex(p + n * kNormalLength);
+			}
+		}
+		// Vertices Normal
+		if (auto N = polygon->vertices.column_as_vector3("N")) {
+			for (int i = 0; i < polygon->indices.size(); i += 3) {
+				std::array<glm::vec3, 3> point;
+				std::array<glm::vec3, 3> normal;
+				for (int j = 0; j < 3; ++j) {
+					uint32_t index = polygon->indices[i + j];
+					P_Column->get(index, glm::value_ptr(point[j]));
+					N->get(i + j, glm::value_ptr(normal[j]));
+				}
+
+				glm::vec3 primitive_center;
+				for (auto p : point) {
+					primitive_center += p;
+				}
+				primitive_center /= (float)point.size();
+
+				for (int j = 0; j < point.size(); ++j) {
+					glm::vec3 n = normal[j];
+					glm::vec3 p = point[j];
+
+					glm::vec3 offsetted_p = glm::mix(p, primitive_center, 0.1f);
+
+					normalMesh.addVertex(offsetted_p);
+					normalMesh.addVertex(offsetted_p + n * kNormalLength);
+				}
 			}
 		}
 
