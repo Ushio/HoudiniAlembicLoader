@@ -11,6 +11,43 @@ void run_unit_test() {
 	session.run();
 }
 
+TEST_CASE("points_attributes.abc", "[points_attributes]") {
+	using namespace houdini_alembic;
+
+	AlembicStorage storage;
+	std::string error_message;
+	REQUIRE(storage.open(ofToDataPath("test_case/points_attributes.abc"), error_message));
+	auto scene = storage.read(0, error_message);
+	REQUIRE(scene);
+	REQUIRE(scene->objects.size() == 1);
+
+	auto point = scene->objects[0].as_point();
+	REQUIRE(point->visible);
+
+	const AttributeVector3Column *P = point->points.column_as_vector3("P");
+	const AttributeVector3Column *N = point->points.column_as_vector3("N");
+	REQUIRE(P);
+	REQUIRE(N);
+	REQUIRE(P->rowCount() == N->rowCount());
+
+	for (int i = 0; i < P->rowCount(); ++i) {
+		glm::vec3 p;
+		P->get(i, glm::value_ptr(p));
+		glm::vec3 n;
+		N->get(i, glm::value_ptr(n));
+
+		p = glm::normalize(p);
+
+		float margin = 1.0e-4f;
+		auto x = Approx(p.x).margin(margin);
+		auto y = Approx(p.y).margin(margin);
+		auto z = Approx(p.z).margin(margin);
+		REQUIRE(n.x == x);
+		REQUIRE(n.y == y);
+		REQUIRE(n.z == z);
+	}
+}
+
 TEST_CASE("polymesh_attributes.abc", "[polymesh_attributes]") {
 	using namespace houdini_alembic;
 
