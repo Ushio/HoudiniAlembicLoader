@@ -154,7 +154,7 @@ inline void drawAlembicCamera(const houdini_alembic::CameraObject *camera, ofMes
 		ofDrawLine(to(camera->eye), to(camera->eye) + (object_vertices[i] - to(camera->eye)) * 3.0f);
 	}
 }
-inline void drawAlembicScene(std::shared_ptr<houdini_alembic::AlembicScene> scene, ofMesh &camera_model, bool draw_camera) {
+inline void drawAlembicScene(houdini_alembic::AlembicScene *scene, ofMesh &camera_model, bool draw_camera) {
 	for (auto o : scene->objects) {
 		if (o->visible == false) {
 			continue;

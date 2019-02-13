@@ -459,7 +459,7 @@ void ofApp::draw() {
 	}
 
 	if (_scene && hide_model == false) {
-		drawAlembicScene(_scene, _camera_model, camera_sync == false /*draw camera*/);
+		drawAlembicScene(_scene.get(), _camera_model, camera_sync == false /*draw camera*/);
 	}
 
 	_camera.end();
