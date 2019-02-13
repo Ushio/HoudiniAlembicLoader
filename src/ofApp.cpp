@@ -277,7 +277,7 @@ inline void show_sheet(const houdini_alembic::AttributeSpreadSheet &sheet) {
 		ImGui::Text("skipped 10000 over points...");
 	}
 }
-inline void show_polygon_sheet(std::shared_ptr<houdini_alembic::PolygonMeshObject> object) {
+inline void show_polygon_sheet(houdini_alembic::PolygonMeshObject *object) {
 	ImGui::Text("[PolygonMeshObject]");
 
 	if (ImGui::BeginTabBar("Geometry SpreadSheet", ImGuiTabBarFlags_None)) {
@@ -300,7 +300,7 @@ inline void show_polygon_sheet(std::shared_ptr<houdini_alembic::PolygonMeshObjec
 		ImGui::EndTabBar();
 	}
 }
-inline void show_point_sheet(std::shared_ptr<houdini_alembic::PointObject> object) {
+inline void show_point_sheet(houdini_alembic::PointObject *object) {
 	ImGui::Text("[PointObject]");
 
 	if (ImGui::BeginTabBar("Geometry SpreadSheet", ImGuiTabBarFlags_None)) {
@@ -313,7 +313,7 @@ inline void show_point_sheet(std::shared_ptr<houdini_alembic::PointObject> objec
 		ImGui::EndTabBar();
 	}
 }
-inline void show_camera(std::shared_ptr<houdini_alembic::CameraObject> camera) {
+inline void show_camera(houdini_alembic::CameraObject *camera) {
 	ImGui::Text("[CameraObject]");
 
 	ImGui::Text("resolution_x : %d", camera->resolution_x);
@@ -342,14 +342,14 @@ inline void show_houdini_alembic(std::shared_ptr<houdini_alembic::AlembicScene> 
 	for (auto object : scene->objects) {
 		imgui_tree(object->name.c_str(), true, [&]() {
 			ImGui::Text("visible : %s", object->visible ? "True" : "False");
-			if (object->type() == houdini_alembic::SceneObjectType_PolygonMesh) {
-				show_polygon_sheet(std::static_pointer_cast<houdini_alembic::PolygonMeshObject>(object));
+			if (auto o = object.as_camera()) {
+				show_camera(o);
 			}
-			else if (object->type() == houdini_alembic::SceneObjectType_Point) {
-				show_point_sheet(std::static_pointer_cast<houdini_alembic::PointObject>(object));
+			else if (auto o = object.as_point()) {
+				show_point_sheet(o);
 			}
-			else if (object->type() == houdini_alembic::SceneObjectType_Camera) {
-				show_camera(std::static_pointer_cast<houdini_alembic::CameraObject>(object));
+			else if (auto o = object.as_polygonMesh()) {
+				show_polygon_sheet(o);
 			}
 		});
 	}
@@ -421,8 +421,7 @@ void ofApp::draw() {
 				continue;
 			}
 
-			if (o->type() == houdini_alembic::SceneObjectType_Camera) {
-				auto camera = std::dynamic_pointer_cast<houdini_alembic::CameraObject>(o);
+			if (auto camera = o.as_camera()) {
 				ofSetWindowShape(camera->resolution_x, camera->resolution_y);
 				_camera.setPosition(camera->eye.x, camera->eye.y, camera->eye.z);
 				_camera.lookAt(

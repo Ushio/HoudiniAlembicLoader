@@ -6,7 +6,7 @@
 const float kNormalLength = 0.1f;
 const ofColor kNormalColor = ofColor(128, 128, 255);
 
-inline void drawAlembicPolygon(std::shared_ptr<houdini_alembic::PolygonMeshObject> polygon) {
+inline void drawAlembicPolygon(const houdini_alembic::PolygonMeshObject *polygon) {
 	auto P_Column = polygon->points.column_as_vector3("P");
 
 	bool isTriangleMesh = std::all_of(polygon->faceCounts.begin(), polygon->faceCounts.end(), [](int32_t f) { return f == 3; });
@@ -88,7 +88,7 @@ inline void drawAlembicPolygon(std::shared_ptr<houdini_alembic::PolygonMeshObjec
 		ofPopMatrix();
 	}
 }
-inline void drawAlembicPoint(std::shared_ptr<houdini_alembic::PointObject> point) {
+inline void drawAlembicPoint(const houdini_alembic::PointObject *point) {
 	auto P_Column = point->points.column_as_vector3("P");
 
 	static ofMesh mesh;
@@ -125,7 +125,7 @@ inline void drawAlembicPoint(std::shared_ptr<houdini_alembic::PointObject> point
 	ofSetColor(kNormalColor);
 	normalMesh.draw();
 }
-inline void drawAlembicCamera(std::shared_ptr<houdini_alembic::CameraObject> camera, ofMesh &camera_model) {
+inline void drawAlembicCamera(const houdini_alembic::CameraObject *camera, ofMesh &camera_model) {
 	ofPushMatrix();
 	ofMultMatrix(camera->combinedXforms.value_ptr());
 
@@ -159,17 +159,14 @@ inline void drawAlembicScene(std::shared_ptr<houdini_alembic::AlembicScene> scen
 		if (o->visible == false) {
 			continue;
 		}
-		if (o->type() == houdini_alembic::SceneObjectType_PolygonMesh) {
-			auto polygon = std::static_pointer_cast<houdini_alembic::PolygonMeshObject>(o);
-			drawAlembicPolygon(polygon);
+		if (auto camera = o.as_camera()) {
+			drawAlembicCamera(camera, camera_model);
 		}
-		else if (o->type() == houdini_alembic::SceneObjectType_Point) {
-			auto point = std::static_pointer_cast<houdini_alembic::PointObject>(o);
+		else if (auto point = o.as_point()) {
 			drawAlembicPoint(point);
 		}
-		else if (o->type() == houdini_alembic::SceneObjectType_Camera && draw_camera) {
-			auto camera = std::static_pointer_cast<houdini_alembic::CameraObject>(o);
-			drawAlembicCamera(camera, camera_model);
+		else if (auto polygon = o.as_polygonMesh()) {
+			drawAlembicPolygon(polygon);
 		}
 	}
 }

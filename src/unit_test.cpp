@@ -21,7 +21,7 @@ TEST_CASE("polymesh_attributes.abc", "[polymesh_attributes]") {
 	REQUIRE(scene);
 	REQUIRE(scene->objects.size() == 1);
 
-	auto polymesh = std::dynamic_pointer_cast<PolygonMeshObject>(scene->objects[0]);
+	auto polymesh = scene->objects[0].as_polygonMesh();
 	REQUIRE(polymesh->visible);
 
 	bool isTriangleMesh = std::all_of(polymesh->faceCounts.begin(), polymesh->faceCounts.end(), [](int32_t f) { return f == 3; });

@@ -5,6 +5,7 @@
 #include <memory>
 #include <map>
 #include <sstream>
+#include <functional>
 
 namespace houdini_alembic {
 	//class Vector2f : public IStringConvertible {
@@ -301,9 +302,31 @@ namespace houdini_alembic {
 		float objectPlaneHeight = 0.0f;
 
 	};
+
+	class SceneObjectPointer {
+	public:
+		SceneObjectPointer(std::shared_ptr<SceneObject> p) {
+			_pointer = p;
+		}
+		PolygonMeshObject *as_polygonMesh() const {
+			return dynamic_cast<PolygonMeshObject *>(_pointer.get());
+		}
+		PointObject *as_point() const {
+			return dynamic_cast<PointObject *>(_pointer.get());
+		}
+		CameraObject *as_camera() const {
+			return dynamic_cast<CameraObject *>(_pointer.get());
+		}
+		SceneObject *operator->() const {
+			return _pointer.get();
+		}
+	private:
+		std::shared_ptr<SceneObject> _pointer;
+	};
+
 	class AlembicScene {
 	public:
-		std::vector<std::shared_ptr<SceneObject>> objects;
+		std::vector<SceneObjectPointer> objects;
 	};
 
 	class AlembicStorage {

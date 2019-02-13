@@ -428,7 +428,7 @@ namespace houdini_alembic {
 		std::sort(pointObject->points.sheet.begin(), pointObject->points.sheet.end());
 	}
 
-	static void parse_object(IObject o, ISampleSelector selector, std::vector<M44d> xforms, std::vector<std::shared_ptr<SceneObject>> &objects) {
+	static void parse_object(IObject o, ISampleSelector selector, std::vector<M44d> xforms, std::vector<SceneObjectPointer> &objects) {
 		auto header = o.getHeader();
 		std::string fullname = header.getFullName();
 
@@ -456,7 +456,7 @@ namespace houdini_alembic {
 				object->visible = true;
 			}
 
-			objects.push_back(object);
+			objects.emplace_back(object);
 		}
 		else if (IPoints::matches(header)) {
 			IPoints points(o);
@@ -482,7 +482,7 @@ namespace houdini_alembic {
 				object->visible = true;
 			}
 
-			objects.push_back(object);
+			objects.emplace_back(object);
 		}
 		else if (ICamera::matches(header)) {
 			// Implementation Notes
@@ -562,7 +562,7 @@ namespace houdini_alembic {
 			object->objectPlaneWidth  = 2.0f * object->focusDistance * std::tan(0.5f * object->fov_horizontal_degree / 360.0f * 2.0 * M_PI);
 			object->objectPlaneHeight = 2.0f * object->focusDistance * std::tan(0.5f * object->fov_vertical_degree   / 360.0f * 2.0 * M_PI);
 
-			objects.push_back(object);
+			objects.emplace_back(object);
 		}
 		else if (IXform::matches(header)) {
 			IXform xform(o);
@@ -583,7 +583,7 @@ namespace houdini_alembic {
 			}
 		}
 	}
-	static void parse_object(IObject o, ISampleSelector selector, std::vector<std::shared_ptr<SceneObject>> &objects) {
+	static void parse_object(IObject o, ISampleSelector selector, std::vector<SceneObjectPointer> &objects) {
 		parse_object(o, selector, std::vector<M44d>(), objects);
 	}
 
