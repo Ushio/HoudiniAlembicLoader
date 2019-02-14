@@ -339,7 +339,10 @@ inline void show_houdini_alembic(std::shared_ptr<houdini_alembic::AlembicScene> 
 		ImGui::Text("scene load failed");
 		return;
 	}
-	for (auto object : scene->objects) {
+	for (int i = 0; i < scene->objects.size(); ++i) {
+		auto object = scene->objects[i];
+		ImGui::PushID(i);
+
 		imgui_tree(object->name.c_str(), true, [&]() {
 			ImGui::Text("visible : %s", object->visible ? "True" : "False");
 			if (auto o = object.as_camera()) {
@@ -352,6 +355,8 @@ inline void show_houdini_alembic(std::shared_ptr<houdini_alembic::AlembicScene> 
 				show_polygon_sheet(o);
 			}
 		});
+
+		ImGui::PopID();
 	}
 }
 
