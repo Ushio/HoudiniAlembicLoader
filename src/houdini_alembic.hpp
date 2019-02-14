@@ -244,8 +244,9 @@ namespace houdini_alembic {
 			return SceneObjectType_PolygonMesh;
 		}
 
-		std::vector<int32_t> faceCounts;
-		std::vector<int32_t> indices;
+		std::vector<uint32_t> faceCounts;
+		std::vector<uint32_t> indices;
+		std::vector<Vector3f> P;
 
 		AttributeSpreadSheet points;
 		AttributeSpreadSheet vertices;
@@ -258,6 +259,8 @@ namespace houdini_alembic {
 		}
 
 		std::vector<uint64_t> pointIds;
+		std::vector<Vector3f> P;
+
 		AttributeSpreadSheet points;
 	};
 	

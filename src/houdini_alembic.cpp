@@ -386,10 +386,10 @@ namespace houdini_alembic {
 		schema.get(sample, selector);
 		
 		Int32ArraySamplePtr faceCounts = sample.getFaceCounts();
-		polymeshObject->faceCounts = std::vector<int32_t>(faceCounts->get(), faceCounts->get() + faceCounts->size());
+		polymeshObject->faceCounts = std::vector<uint32_t>(faceCounts->get(), faceCounts->get() + faceCounts->size());
 
 		Int32ArraySamplePtr indices = sample.getFaceIndices();
-		polymeshObject->indices = std::vector<int32_t>(indices->get(), indices->get() + indices->size());
+		polymeshObject->indices = std::vector<uint32_t>(indices->get(), indices->get() + indices->size());
 
 		parse_attributes(
 			&polymeshObject->points, &polymeshObject->vertices, &polymeshObject->primitives,
@@ -399,6 +399,14 @@ namespace houdini_alembic {
 			&polymeshObject->points, &polymeshObject->vertices, &polymeshObject->primitives,
 			ICompoundProperty(polyMesh.getProperties(), ".geom"), selector
 		);
+
+		// Pは流石に登場頻度が高いので予め入れておく
+		auto p = polymeshObject->points.column_as_vector3("P");
+		polymeshObject->P.resize(p->rowCount());
+		for (int i = 0; i < polymeshObject->P.size() ; ++i) {
+			float *xyz = (float *)&polymeshObject->P[i];
+			p->get(i, xyz);
+		}
 	}
 
 	inline void parse_points(IPoints points, std::shared_ptr<PointObject> pointObject, ISampleSelector selector) {
@@ -417,6 +425,14 @@ namespace houdini_alembic {
 			&pointObject->points, nullptr, nullptr,
 			ICompoundProperty(points.getProperties(), ".geom"), selector
 		);
+
+		// Pは流石に登場頻度が高いので予め入れておく
+		auto p = pointObject->points.column_as_vector3("P");
+		pointObject->P.resize(p->rowCount());
+		for (int i = 0; i < pointObject->P.size(); ++i) {
+			float *xyz = (float *)&pointObject->P[i];
+			p->get(i, xyz);
+		}
 	}
 
 	static void parse_common_property(IObject o, SceneObject *object, const std::vector<M44d> &xforms, ISampleSelector selector) {

@@ -7,7 +7,7 @@ const float kNormalLength = 0.1f;
 const ofColor kNormalColor = ofColor(32, 32, 255);
 
 inline void drawAlembicPolygon(const houdini_alembic::PolygonMeshObject *polygon) {
-	auto P_Column = polygon->points.column_as_vector3("P");
+	// auto P_Column = polygon->points.column_as_vector3("P");
 
 	bool isTriangleMesh = std::all_of(polygon->faceCounts.begin(), polygon->faceCounts.end(), [](int32_t f) { return f == 3; });
 
@@ -20,11 +20,8 @@ inline void drawAlembicPolygon(const houdini_alembic::PolygonMeshObject *polygon
 		normalMesh.clear();
 		normalMesh.setMode(OF_PRIMITIVE_LINES);
 
-		int rowCount = P_Column->rowCount();
-		for (int i = 0; i < rowCount; ++i) {
-			glm::vec3 p;
-			P_Column->get(i, glm::value_ptr(p));
-			mesh.addVertex(p);
+		for (auto p : polygon->P) {
+			mesh.addVertex(glm::vec3(p.x, p.y, p.z));
 		}
 
 		for (auto index : polygon->indices) {
@@ -34,8 +31,7 @@ inline void drawAlembicPolygon(const houdini_alembic::PolygonMeshObject *polygon
 		// Point Normal
 		if (auto N = polygon->points.column_as_vector3("N")) {
 			for (int i = 0; i < N->rowCount(); ++i) {
-				glm::vec3 p;
-				P_Column->get(i, glm::value_ptr(p));
+				glm::vec3 p = { polygon->P[i].x, polygon->P[i].y , polygon->P[i].z };
 
 				glm::vec3 n;
 				N->get(i, glm::value_ptr(n));
@@ -51,7 +47,7 @@ inline void drawAlembicPolygon(const houdini_alembic::PolygonMeshObject *polygon
 				std::array<glm::vec3, 3> normal;
 				for (int j = 0; j < 3; ++j) {
 					uint32_t index = polygon->indices[i + j];
-					P_Column->get(index, glm::value_ptr(point[j]));
+					point[j] = glm::vec3(polygon->P[index].x, polygon->P[index].y, polygon->P[index].z);
 					N->get(i + j, glm::value_ptr(normal[j]));
 				}
 
@@ -118,8 +114,6 @@ inline void drawAlembicPolygon(const houdini_alembic::PolygonMeshObject *polygon
 	}
 }
 inline void drawAlembicPoint(const houdini_alembic::PointObject *point) {
-	auto P_Column = point->points.column_as_vector3("P");
-
 	static ofMesh mesh;
 	static ofMesh normalMesh;
 	mesh.clear();
@@ -128,17 +122,13 @@ inline void drawAlembicPoint(const houdini_alembic::PointObject *point) {
 	normalMesh.clear();
 	normalMesh.setMode(OF_PRIMITIVE_LINES);
 
-	int rowCount = P_Column->rowCount();
-	for (int i = 0; i < rowCount; ++i) {
-		glm::vec3 p;
-		P_Column->get(i, glm::value_ptr(p));
-		mesh.addVertex(p);
+	for (auto p : point->P) {
+		mesh.addVertex(glm::vec3(p.x, p.y, p.z));
 	}
 
 	if (auto N = point->points.column_as_vector3("N")) {
 		for (int i = 0; i < N->rowCount(); ++i) {
-			glm::vec3 p;
-			P_Column->get(i, glm::value_ptr(p));
+			glm::vec3 p = { point->P[i].x, point->P[i].y, point->P[i].z };
 
 			glm::vec3 n;
 			N->get(i, glm::value_ptr(n));

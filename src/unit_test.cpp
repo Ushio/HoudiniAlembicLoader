@@ -29,6 +29,21 @@ TEST_CASE("points_attributes.abc", "[points_attributes]") {
 	REQUIRE(P);
 	REQUIRE(N);
 	REQUIRE(P->rowCount() == N->rowCount());
+	REQUIRE(P->rowCount() == point->P.size());
+
+	// point->PとアトリビュートのPは同じでなければならない
+	for (int i = 0; i < P->rowCount(); ++i) {
+		glm::vec3 p;
+		P->get(i, glm::value_ptr(p));
+
+		float margin = 1.0e-4f;
+		auto x = Approx(p.x).margin(margin);
+		auto y = Approx(p.y).margin(margin);
+		auto z = Approx(p.z).margin(margin);
+		REQUIRE(point->P[i].x == x);
+		REQUIRE(point->P[i].y == y);
+		REQUIRE(point->P[i].z == z);
+	}
 
 	for (int i = 0; i < P->rowCount(); ++i) {
 		glm::vec3 p;
@@ -63,6 +78,24 @@ TEST_CASE("polymesh_attributes.abc", "[polymesh_attributes]") {
 
 	bool isTriangleMesh = std::all_of(polymesh->faceCounts.begin(), polymesh->faceCounts.end(), [](int32_t f) { return f == 3; });
 	REQUIRE(isTriangleMesh);
+
+	// point->PとアトリビュートのPは同じでなければならない
+	SECTION("P") {
+		const AttributeVector3Column *P = polymesh->points.column_as_vector3("P");
+		REQUIRE(P);
+		for (int i = 0; i < P->rowCount(); ++i) {
+			glm::vec3 p;
+			P->get(i, glm::value_ptr(p));
+
+			float margin = 1.0e-4f;
+			auto x = Approx(p.x).margin(margin);
+			auto y = Approx(p.y).margin(margin);
+			auto z = Approx(p.z).margin(margin);
+			REQUIRE(polymesh->P[i].x == x);
+			REQUIRE(polymesh->P[i].y == y);
+			REQUIRE(polymesh->P[i].z == z);
+		}
+	}
 
 	SECTION("Points") {
 		const AttributeIntColumn *int_values = polymesh->points.column_as_int("int_points");
