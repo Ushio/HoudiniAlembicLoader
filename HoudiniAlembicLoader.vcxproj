@@ -100,7 +100,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(VcpkgRoot)include/OpenExr;src/imgui-1.67;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src/imgui-1.67;src/abc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
@@ -120,7 +120,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(VcpkgRoot)include/OpenExr;src/imgui-1.67;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src/imgui-1.67;src/abc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
@@ -140,7 +140,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(VcpkgRoot)include/OpenExr;src/imgui-1.67;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src/imgui-1.67;src/abc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
@@ -163,7 +163,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(VcpkgRoot)include/OpenExr;src/imgui-1.67;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src/imgui-1.67;src/abc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
@@ -180,6 +180,132 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\abc\Alembic\AbcCollection\ICollections_AbcCollection.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCollection\OCollections_AbcCollection.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreAbstract\ArchiveReader_AbcCoreAbstract.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreAbstract\ArchiveWriter_AbcCoreAbstract.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreAbstract\ArrayPropertyReader_AbcCoreAbstract.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreAbstract\ArrayPropertyWriter_AbcCoreAbstract.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreAbstract\ArraySample_AbcCoreAbstract.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreAbstract\BasePropertyReader_AbcCoreAbstract.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreAbstract\BasePropertyWriter_AbcCoreAbstract.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreAbstract\CompoundPropertyReader_AbcCoreAbstract.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreAbstract\CompoundPropertyWriter_AbcCoreAbstract.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreAbstract\Foundation_AbcCoreAbstract.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreAbstract\ObjectReader_AbcCoreAbstract.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreAbstract\ObjectWriter_AbcCoreAbstract.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreAbstract\ReadArraySampleCache_AbcCoreAbstract.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreAbstract\ScalarPropertyReader_AbcCoreAbstract.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreAbstract\ScalarPropertyWriter_AbcCoreAbstract.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreAbstract\ScalarSample_AbcCoreAbstract.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreAbstract\TimeSamplingType_AbcCoreAbstract.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreAbstract\TimeSampling_AbcCoreAbstract.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreFactory\IFactory_AbcCoreFactory.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreLayer\ArImpl_AbcCoreLayer.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreLayer\CprImpl_AbcCoreLayer.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreLayer\OrImpl_AbcCoreLayer.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreLayer\Read_AbcCoreLayer.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreLayer\Util_AbcCoreLayer.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreOgawa\AprImpl_AbcCoreOgawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreOgawa\ApwImpl_AbcCoreOgawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreOgawa\ArImpl_AbcCoreOgawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreOgawa\AwImpl_AbcCoreOgawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreOgawa\CprData_AbcCoreOgawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreOgawa\CprImpl_AbcCoreOgawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreOgawa\CpwData_AbcCoreOgawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreOgawa\CpwImpl_AbcCoreOgawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreOgawa\MetaDataMap_AbcCoreOgawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreOgawa\OrData_AbcCoreOgawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreOgawa\OrImpl_AbcCoreOgawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreOgawa\OwData_AbcCoreOgawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreOgawa\OwImpl_AbcCoreOgawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreOgawa\ReadUtil_AbcCoreOgawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreOgawa\ReadWrite_AbcCoreOgawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreOgawa\SprImpl_AbcCoreOgawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreOgawa\SpwImpl_AbcCoreOgawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreOgawa\StreamManager_AbcCoreOgawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcCoreOgawa\WriteUtil_AbcCoreOgawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\ArchiveBounds_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\Basis_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\CameraSample_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\FilmBackXformOp_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\GeometryScope_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\ICamera_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\ICurves_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\IFaceSet_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\ILight_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\INuPatch_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\IPoints_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\IPolyMesh_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\ISubD_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\IXform_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\OCamera_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\OCurves_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\OFaceSet_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\OLight_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\ONuPatch_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\OPoints_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\OPolyMesh_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\OSubD_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\OXform_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\Visibility_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\XformOp_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcGeom\XformSample_AbcGeom.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcMaterial\IMaterial_AbcMaterial.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcMaterial\InternalUtil_AbcMaterial.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcMaterial\MaterialAssignment_AbcMaterial.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcMaterial\MaterialFlatten_AbcMaterial.cpp" />
+    <ClCompile Include="src\abc\Alembic\AbcMaterial\OMaterial_AbcMaterial.cpp" />
+    <ClCompile Include="src\abc\Alembic\Abc\ArchiveInfo_Abc.cpp" />
+    <ClCompile Include="src\abc\Alembic\Abc\ErrorHandler_Abc.cpp" />
+    <ClCompile Include="src\abc\Alembic\Abc\IArchive_Abc.cpp" />
+    <ClCompile Include="src\abc\Alembic\Abc\IArrayProperty_Abc.cpp" />
+    <ClCompile Include="src\abc\Alembic\Abc\ICompoundProperty_Abc.cpp" />
+    <ClCompile Include="src\abc\Alembic\Abc\IObject_Abc.cpp" />
+    <ClCompile Include="src\abc\Alembic\Abc\ISampleSelector_Abc.cpp" />
+    <ClCompile Include="src\abc\Alembic\Abc\IScalarProperty_Abc.cpp" />
+    <ClCompile Include="src\abc\Alembic\Abc\OArchive_Abc.cpp" />
+    <ClCompile Include="src\abc\Alembic\Abc\OArrayProperty_Abc.cpp" />
+    <ClCompile Include="src\abc\Alembic\Abc\OCompoundProperty_Abc.cpp" />
+    <ClCompile Include="src\abc\Alembic\Abc\OObject_Abc.cpp" />
+    <ClCompile Include="src\abc\Alembic\Abc\OScalarProperty_Abc.cpp" />
+    <ClCompile Include="src\abc\Alembic\Abc\Reference_Abc.cpp" />
+    <ClCompile Include="src\abc\Alembic\Abc\SourceName_Abc.cpp" />
+    <ClCompile Include="src\abc\Alembic\Ogawa\IArchive_Ogawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\Ogawa\IData_Ogawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\Ogawa\IGroup_Ogawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\Ogawa\IStreams_Ogawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\Ogawa\OArchive_Ogawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\Ogawa\OData_Ogawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\Ogawa\OGroup_Ogawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\Ogawa\OStream_Ogawa.cpp" />
+    <ClCompile Include="src\abc\Alembic\Util\Murmur3_Util.cpp" />
+    <ClCompile Include="src\abc\Alembic\Util\Naming_Util.cpp" />
+    <ClCompile Include="src\abc\Alembic\Util\SpookyV2_Util.cpp" />
+    <ClCompile Include="src\abc\Alembic\Util\TokenMap_Util.cpp" />
+    <ClCompile Include="src\abc\half_half.cpp" />
+    <ClCompile Include="src\abc\IexBaseExc_IexBaseExc.cpp" />
+    <ClCompile Include="src\abc\IexMathFloatExc_IexMathFloatExc.cpp" />
+    <ClCompile Include="src\abc\IexMathFpu_IexMathFpu.cpp" />
+    <ClCompile Include="src\abc\IexThrowErrnoExc_IexThrowErrnoExc.cpp" />
+    <ClCompile Include="src\abc\IlmThreadMutexPosix_IlmThreadMutexPosix.cpp" />
+    <ClCompile Include="src\abc\IlmThreadMutexWin32_IlmThreadMutexWin32.cpp" />
+    <ClCompile Include="src\abc\IlmThreadMutex_IlmThreadMutex.cpp" />
+    <ClCompile Include="src\abc\IlmThreadPool_IlmThreadPool.cpp" />
+    <ClCompile Include="src\abc\IlmThreadPosix_IlmThreadPosix.cpp" />
+    <ClCompile Include="src\abc\IlmThreadSemaphorePosixCompat_IlmThreadSemaphorePosixCompat.cpp" />
+    <ClCompile Include="src\abc\IlmThreadSemaphorePosix_IlmThreadSemaphorePosix.cpp" />
+    <ClCompile Include="src\abc\IlmThreadSemaphoreWin32_IlmThreadSemaphoreWin32.cpp" />
+    <ClCompile Include="src\abc\IlmThreadSemaphore_IlmThreadSemaphore.cpp" />
+    <ClCompile Include="src\abc\IlmThreadWin32_IlmThreadWin32.cpp" />
+    <ClCompile Include="src\abc\IlmThread_IlmThread.cpp" />
+    <ClCompile Include="src\abc\ImathBox_ImathBox.cpp" />
+    <ClCompile Include="src\abc\ImathColorAlgo_ImathColorAlgo.cpp" />
+    <ClCompile Include="src\abc\ImathFun_ImathFun.cpp" />
+    <ClCompile Include="src\abc\ImathMatrixAlgo_ImathMatrixAlgo.cpp" />
+    <ClCompile Include="src\abc\ImathRandom_ImathRandom.cpp" />
+    <ClCompile Include="src\abc\ImathShear_ImathShear.cpp" />
+    <ClCompile Include="src\abc\ImathVec_ImathVec.cpp" />
     <ClCompile Include="src\houdini_alembic.cpp" />
     <ClCompile Include="src\imgui-1.67\imgui.cpp" />
     <ClCompile Include="src\imgui-1.67\imgui_demo.cpp" />
@@ -192,6 +318,220 @@
     <ClCompile Include="src\unit_test.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\abc\Alembic\AbcCollection\All.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCollection\ICollections.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCollection\OCollections.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCollection\SchemaInfoDeclarations.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\All.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\ArchiveReader.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\ArchiveWriter.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\ArrayPropertyReader.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\ArrayPropertyWriter.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\ArraySample.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\ArraySampleKey.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\BasePropertyReader.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\BasePropertyWriter.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\CompoundPropertyReader.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\CompoundPropertyWriter.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\DataType.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\ForwardDeclarations.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\Foundation.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\MetaData.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\ObjectHeader.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\ObjectReader.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\ObjectWriter.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\PropertyHeader.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\ReadArraySampleCache.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\ScalarPropertyReader.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\ScalarPropertyWriter.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\ScalarSample.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\TimeSampling.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreAbstract\TimeSamplingType.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreFactory\All.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreFactory\IFactory.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreLayer\ArImpl.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreLayer\CprImpl.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreLayer\Foundation.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreLayer\OrImpl.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreLayer\Read.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreLayer\Util.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreOgawa\All.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreOgawa\AprImpl.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreOgawa\ApwImpl.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreOgawa\ArImpl.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreOgawa\AwImpl.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreOgawa\CprData.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreOgawa\CprImpl.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreOgawa\CpwData.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreOgawa\CpwImpl.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreOgawa\Foundation.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreOgawa\MetaDataMap.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreOgawa\OrData.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreOgawa\OrImpl.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreOgawa\OwData.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreOgawa\OwImpl.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreOgawa\ReadUtil.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreOgawa\ReadWrite.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreOgawa\SprImpl.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreOgawa\SpwImpl.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreOgawa\StreamManager.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreOgawa\WriteUtil.h" />
+    <ClInclude Include="src\abc\Alembic\AbcCoreOgawa\WrittenSampleMap.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\All.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\ArchiveBounds.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\Basis.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\CameraSample.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\CurveType.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\FaceSetExclusivity.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\FilmBackXformOp.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\Foundation.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\GeometryScope.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\ICamera.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\ICurves.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\IFaceSet.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\IGeomBase.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\IGeomParam.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\ILight.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\INuPatch.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\IPoints.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\IPolyMesh.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\ISubD.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\IXform.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\OCamera.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\OCurves.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\OFaceSet.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\OGeomBase.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\OGeomParam.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\OLight.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\ONuPatch.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\OPoints.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\OPolyMesh.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\OSubD.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\OXform.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\SchemaInfoDeclarations.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\Visibility.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\XformOp.h" />
+    <ClInclude Include="src\abc\Alembic\AbcGeom\XformSample.h" />
+    <ClInclude Include="src\abc\Alembic\AbcMaterial\All.h" />
+    <ClInclude Include="src\abc\Alembic\AbcMaterial\IMaterial.h" />
+    <ClInclude Include="src\abc\Alembic\AbcMaterial\InternalUtil.h" />
+    <ClInclude Include="src\abc\Alembic\AbcMaterial\MaterialAssignment.h" />
+    <ClInclude Include="src\abc\Alembic\AbcMaterial\MaterialFlatten.h" />
+    <ClInclude Include="src\abc\Alembic\AbcMaterial\OMaterial.h" />
+    <ClInclude Include="src\abc\Alembic\AbcMaterial\SchemaInfoDeclarations.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\All.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\ArchiveInfo.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\Argument.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\Base.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\ErrorHandler.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\Foundation.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\IArchive.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\IArrayProperty.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\IBaseProperty.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\ICompoundProperty.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\IObject.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\ISampleSelector.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\IScalarProperty.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\ISchema.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\ISchemaObject.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\ITypedArrayProperty.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\ITypedScalarProperty.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\OArchive.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\OArrayProperty.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\OBaseProperty.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\OCompoundProperty.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\OObject.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\OScalarProperty.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\OSchema.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\OSchemaObject.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\OTypedArrayProperty.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\OTypedScalarProperty.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\Reference.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\SourceName.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\TypedArraySample.h" />
+    <ClInclude Include="src\abc\Alembic\Abc\TypedPropertyTraits.h" />
+    <ClInclude Include="src\abc\Alembic\Ogawa\All.h" />
+    <ClInclude Include="src\abc\Alembic\Ogawa\Foundation.h" />
+    <ClInclude Include="src\abc\Alembic\Ogawa\IArchive.h" />
+    <ClInclude Include="src\abc\Alembic\Ogawa\IData.h" />
+    <ClInclude Include="src\abc\Alembic\Ogawa\IGroup.h" />
+    <ClInclude Include="src\abc\Alembic\Ogawa\IStreams.h" />
+    <ClInclude Include="src\abc\Alembic\Ogawa\OArchive.h" />
+    <ClInclude Include="src\abc\Alembic\Ogawa\OData.h" />
+    <ClInclude Include="src\abc\Alembic\Ogawa\OGroup.h" />
+    <ClInclude Include="src\abc\Alembic\Ogawa\OStream.h" />
+    <ClInclude Include="src\abc\Alembic\Util\All.h" />
+    <ClInclude Include="src\abc\Alembic\Util\Config.h" />
+    <ClInclude Include="src\abc\Alembic\Util\Digest.h" />
+    <ClInclude Include="src\abc\Alembic\Util\Dimensions.h" />
+    <ClInclude Include="src\abc\Alembic\Util\Exception.h" />
+    <ClInclude Include="src\abc\Alembic\Util\Export.h" />
+    <ClInclude Include="src\abc\Alembic\Util\Foundation.h" />
+    <ClInclude Include="src\abc\Alembic\Util\Murmur3.h" />
+    <ClInclude Include="src\abc\Alembic\Util\Naming.h" />
+    <ClInclude Include="src\abc\Alembic\Util\OperatorBool.h" />
+    <ClInclude Include="src\abc\Alembic\Util\PlainOldDataType.h" />
+    <ClInclude Include="src\abc\Alembic\Util\SpookyV2.h" />
+    <ClInclude Include="src\abc\Alembic\Util\TokenMap.h" />
+    <ClInclude Include="src\abc\eLut.h" />
+    <ClInclude Include="src\abc\half.h" />
+    <ClInclude Include="src\abc\halfExport.h" />
+    <ClInclude Include="src\abc\halfFunction.h" />
+    <ClInclude Include="src\abc\halfLimits.h" />
+    <ClInclude Include="src\abc\Iex.h" />
+    <ClInclude Include="src\abc\IexBaseExc.h" />
+    <ClInclude Include="src\abc\IexErrnoExc.h" />
+    <ClInclude Include="src\abc\IexExport.h" />
+    <ClInclude Include="src\abc\IexForward.h" />
+    <ClInclude Include="src\abc\IexMacros.h" />
+    <ClInclude Include="src\abc\IexMathExc.h" />
+    <ClInclude Include="src\abc\IexMathFloatExc.h" />
+    <ClInclude Include="src\abc\IexMathFpu.h" />
+    <ClInclude Include="src\abc\IexMathIeeeExc.h" />
+    <ClInclude Include="src\abc\IexNamespace.h" />
+    <ClInclude Include="src\abc\IexThrowErrnoExc.h" />
+    <ClInclude Include="src\abc\IlmBaseConfig.h" />
+    <ClInclude Include="src\abc\IlmThread.h" />
+    <ClInclude Include="src\abc\IlmThreadExport.h" />
+    <ClInclude Include="src\abc\IlmThreadForward.h" />
+    <ClInclude Include="src\abc\IlmThreadMutex.h" />
+    <ClInclude Include="src\abc\IlmThreadNamespace.h" />
+    <ClInclude Include="src\abc\IlmThreadPool.h" />
+    <ClInclude Include="src\abc\IlmThreadSemaphore.h" />
+    <ClInclude Include="src\abc\ImathBox.h" />
+    <ClInclude Include="src\abc\ImathBoxAlgo.h" />
+    <ClInclude Include="src\abc\ImathColor.h" />
+    <ClInclude Include="src\abc\ImathColorAlgo.h" />
+    <ClInclude Include="src\abc\ImathEuler.h" />
+    <ClInclude Include="src\abc\ImathExc.h" />
+    <ClInclude Include="src\abc\ImathExport.h" />
+    <ClInclude Include="src\abc\ImathForward.h" />
+    <ClInclude Include="src\abc\ImathFrame.h" />
+    <ClInclude Include="src\abc\ImathFrustum.h" />
+    <ClInclude Include="src\abc\ImathFrustumTest.h" />
+    <ClInclude Include="src\abc\ImathFun.h" />
+    <ClInclude Include="src\abc\ImathGL.h" />
+    <ClInclude Include="src\abc\ImathGLU.h" />
+    <ClInclude Include="src\abc\ImathHalfLimits.h" />
+    <ClInclude Include="src\abc\ImathInt64.h" />
+    <ClInclude Include="src\abc\ImathInterval.h" />
+    <ClInclude Include="src\abc\ImathLimits.h" />
+    <ClInclude Include="src\abc\ImathLine.h" />
+    <ClInclude Include="src\abc\ImathLineAlgo.h" />
+    <ClInclude Include="src\abc\ImathMath.h" />
+    <ClInclude Include="src\abc\ImathMatrix.h" />
+    <ClInclude Include="src\abc\ImathMatrixAlgo.h" />
+    <ClInclude Include="src\abc\ImathNamespace.h" />
+    <ClInclude Include="src\abc\ImathPlane.h" />
+    <ClInclude Include="src\abc\ImathPlatform.h" />
+    <ClInclude Include="src\abc\ImathQuat.h" />
+    <ClInclude Include="src\abc\ImathRandom.h" />
+    <ClInclude Include="src\abc\ImathRoots.h" />
+    <ClInclude Include="src\abc\ImathShear.h" />
+    <ClInclude Include="src\abc\ImathSphere.h" />
+    <ClInclude Include="src\abc\ImathVec.h" />
+    <ClInclude Include="src\abc\ImathVecAlgo.h" />
+    <ClInclude Include="src\abc\toFloat.h" />
     <ClInclude Include="src\houdini_alembic.hpp" />
     <ClInclude Include="src\imgui-1.67\imconfig.h" />
     <ClInclude Include="src\imgui-1.67\imgui.h" />
