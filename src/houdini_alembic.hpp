@@ -264,6 +264,10 @@ namespace houdini_alembic {
 		AttributeSpreadSheet points;
 	};
 	
+	/*
+	Parameter descriptions
+	https://docs.google.com/presentation/d/1f5EVQTul15x4Q30IbeA7hP9_Xc0AgDnWsOacSQmnNT8/edit?usp=sharing
+	*/
 	class CameraObject : public SceneObject {
 	public:
 		SceneObjectType type() const override {
@@ -281,29 +285,28 @@ namespace houdini_alembic {
 		/*
 		 Houdini Parameters [ View ]
 		*/
-		int resolution_x = 0; /* Resolution x */
-		int resolution_y = 0; /* Resolution y */
-		float focalLength_mm = 50.0f; /* Focal Length */
-		float aperture_horizontal_mm = 41.4214; /* Aperture */
-		float aperture_vertical_mm = 0;
-		float nearClip = 0.001f;
-		float farClip = 10000.0f;
+		int resolution_x = 0; /* Resolution x (in pixels) */
+		int resolution_y = 0; /* Resolution y (in pixels) */
+		float focalLength_mm = 50.0f; /* Focal Length (in millimeter) */
+		float aperture_horizontal_mm = 41.4214; /* Aperture (in millimeter) */
+		float aperture_vertical_mm = 0;         /* Aperture (in millimeter) */
+		float nearClip = 0.001f;  /* Near Clipping (in meter) */
+		float farClip = 10000.0f; /* Far  Clipping (in meter) */
 
 		/*
 		 Houdini Parameters [ Sampling ]
 		*/
-		float focusDistance = 0.0f;
-		float f_stop = 5.6f;
+		float focusDistance = 0.0f; /* Focus Distance (in meter) */
+		float f_stop = 5.6f;        /* F-Stop */
 
 		/*
 		 Calculated by Parameters
 		*/
-		float fov_horizontal_degree = 45.0f;
-		float fov_vertical_degree = 45.0f;
-		float lensRadius = 0.0f;
-		float objectPlaneWidth = 0.0f;
-		float objectPlaneHeight = 0.0f;
-
+		float fov_horizontal_degree = 45.0f; /* fov (in degree) */
+		float fov_vertical_degree = 45.0f;   /* fov (in degree) */
+		float lensRadius = 0.0f; /* fov (in meter) */
+		float objectPlaneWidth = 0.0f;  /* object plane width  (in meter) */
+		float objectPlaneHeight = 0.0f; /* object plane height (in meter) */
 	};
 
 	class SceneObjectPointer {
