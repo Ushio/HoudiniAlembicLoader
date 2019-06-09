@@ -3,7 +3,7 @@
 - Read Camera Parameters
 
 ## Dependencies
-- bopenframeworks (0.10.1)
+- openframeworks (0.10.1)
 - Alembic (1.7.10) 
 
 ## Alembic Setup
