@@ -213,6 +213,7 @@ namespace houdini_alembic {
 	enum SceneObjectType {
 		SceneObjectType_PolygonMesh,
 		SceneObjectType_Point,
+		SceneObjectType_Curve,
 		SceneObjectType_Camera,
 	};
 	class SceneObject {
@@ -262,6 +263,24 @@ namespace houdini_alembic {
 		std::vector<Vector3f> P;
 
 		AttributeSpreadSheet points;
+	};
+
+	class CurveObject : public SceneObject {
+	public:
+		SceneObjectType type() const override {
+			return SceneObjectType_Curve;
+		}
+
+		struct CurvePrimitive {
+			int32_t P_beg_index = 0;
+			int32_t P_end_index = 0;
+		};
+		std::vector<CurvePrimitive> curvePrimitives;
+		std::vector<Vector3f> P;
+
+		AttributeSpreadSheet points;
+		AttributeSpreadSheet vertices;
+		AttributeSpreadSheet primitives;
 	};
 	
 	/*
@@ -319,6 +338,9 @@ namespace houdini_alembic {
 		}
 		PointObject *as_point() const {
 			return dynamic_cast<PointObject *>(_pointer.get());
+		}
+		CurveObject *as_curve() const {
+			return dynamic_cast<CurveObject *>(_pointer.get());
 		}
 		CameraObject *as_camera() const {
 			return dynamic_cast<CameraObject *>(_pointer.get());

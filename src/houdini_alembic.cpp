@@ -435,6 +435,44 @@ namespace houdini_alembic {
 		}
 	}
 
+	inline void parse_curves(ICurves curves, std::shared_ptr<CurveObject> curveObject, ISampleSelector selector) {
+		auto schema = curves.getSchema();
+		ICurvesSchema::Sample sample;
+		schema.get(sample, selector);
+
+		parse_attributes(
+			&curveObject->points, &curveObject->vertices, &curveObject->primitives,
+			schema.getArbGeomParams(), selector
+		);
+		parse_attributes(
+			&curveObject->points, &curveObject->vertices, &curveObject->primitives,
+			ICompoundProperty(curves.getProperties(), ".geom"), selector
+		);
+
+		Int32ArraySamplePtr curvePointCounts = sample.getCurvesNumVertices();
+		curveObject->curvePrimitives.reserve(curvePointCounts->size());
+
+		int32_t P_index_Head = 0;
+		for (int i = 0; i < curvePointCounts->size(); ++i) {
+			auto N = curvePointCounts->get()[i];
+
+			CurveObject::CurvePrimitive primitive;
+			primitive.P_beg_index = P_index_Head;
+			primitive.P_end_index = P_index_Head + N;
+			curveObject->curvePrimitives.emplace_back(primitive);
+
+			P_index_Head += N;
+		}
+
+		// Pは流石に登場頻度が高いので予め入れておく
+		auto p = curveObject->points.column_as_vector3("P");
+		curveObject->P.resize(p->rowCount());
+		for (int i = 0; i < curveObject->P.size(); ++i) {
+			float *xyz = (float *)&curveObject->P[i];
+			p->get(i, xyz);
+		}
+	}
+
 	static void parse_common_property(IObject o, SceneObject *object, const std::vector<M44d> &xforms, ISampleSelector selector) {
 		IXform parentXForm(o.getParent());
 		object->name = parentXForm.getFullName();
@@ -474,6 +512,15 @@ namespace houdini_alembic {
 
 			parse_common_property(o, object.get(), xforms, selector);
 			parse_points(points, object, selector);
+
+			objects.emplace_back(object);
+		}
+		else if (ICurves::matches(header)) {
+			ICurves curves(o);
+			std::shared_ptr<CurveObject> object(new CurveObject());
+
+			parse_common_property(o, object.get(), xforms, selector);
+			parse_curves(curves, object, selector);
 
 			objects.emplace_back(object);
 		}

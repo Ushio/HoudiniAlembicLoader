@@ -313,6 +313,29 @@ inline void show_point_sheet(houdini_alembic::PointObject *object) {
 		ImGui::EndTabBar();
 	}
 }
+inline void show_curve_sheet(houdini_alembic::CurveObject *object) {
+	ImGui::Text("[CurveObject]");
+
+	if (ImGui::BeginTabBar("Geometry SpreadSheet", ImGuiTabBarFlags_None)) {
+		ImGui::Spacing();
+		if (ImGui::BeginTabItem("Points"))
+		{
+			show_sheet(object->points);
+			ImGui::EndTabItem();
+		}
+		if (ImGui::BeginTabItem("Vertices"))
+		{
+			show_sheet(object->vertices);
+			ImGui::EndTabItem();
+		}
+		if (ImGui::BeginTabItem("Primitives"))
+		{
+			show_sheet(object->primitives);
+			ImGui::EndTabItem();
+		}
+		ImGui::EndTabBar();
+	}
+}
 inline void show_camera(houdini_alembic::CameraObject *camera) {
 	ImGui::Text("[CameraObject]");
 
@@ -354,6 +377,9 @@ inline void show_houdini_alembic(std::shared_ptr<houdini_alembic::AlembicScene> 
 			else if (auto o = object.as_polygonMesh()) {
 				show_polygon_sheet(o);
 			}
+			else if (auto o = object.as_curve()) {
+				show_curve_sheet(o);
+			}
 		});
 
 		ImGui::PopID();
@@ -382,7 +408,7 @@ void ofApp::setup() {
 
 	_camera_model.load("camera_model.ply");
 
-	open_alembic(ofToDataPath("points.abc"));
+	open_alembic(ofToDataPath("lines_and_curves.abc"));
 
 	ofSetVerticalSync(false);
 }

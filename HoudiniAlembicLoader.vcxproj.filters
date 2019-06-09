@@ -1097,6 +1097,9 @@
     <ClInclude Include="src\abc\toFloat.h">
       <Filter>src\abc</Filter>
     </ClInclude>
+    <ClInclude Include="src\alembic_preview.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />

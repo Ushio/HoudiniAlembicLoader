@@ -532,6 +532,7 @@
     <ClInclude Include="src\abc\ImathVec.h" />
     <ClInclude Include="src\abc\ImathVecAlgo.h" />
     <ClInclude Include="src\abc\toFloat.h" />
+    <ClInclude Include="src\alembic_preview.hpp" />
     <ClInclude Include="src\houdini_alembic.hpp" />
     <ClInclude Include="src\imgui-1.67\imconfig.h" />
     <ClInclude Include="src\imgui-1.67\imgui.h" />

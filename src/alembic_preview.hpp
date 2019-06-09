@@ -138,11 +138,38 @@ inline void drawAlembicPoint(const houdini_alembic::PointObject *point) {
 		}
 	}
 
+	ofPushMatrix();
+	ofMultMatrix(point->combinedXforms.value_ptr());
+
 	ofSetColor(200);
 	mesh.draw();
 
 	ofSetColor(kNormalColor);
 	normalMesh.draw();
+
+	ofPopMatrix();
+}
+inline void drawAlembicCurve(const houdini_alembic::CurveObject *point) {
+	static ofMesh mesh;
+	mesh.clear();
+	mesh.setMode(OF_PRIMITIVE_LINES);
+
+	for (auto p : point->P) {
+		mesh.addVertex(glm::vec3(p.x, p.y, p.z));
+	}
+	for (auto primitive : point->curvePrimitives) {
+		for (int32_t i = primitive.P_beg_index; i < primitive.P_end_index - 1; ++i) {
+			mesh.addIndex(i);
+			mesh.addIndex(i + 1);
+		}
+	}
+	ofPushMatrix();
+	ofMultMatrix(point->combinedXforms.value_ptr());
+
+	ofSetColor(255);
+	mesh.draw();
+
+	ofPopMatrix();
 }
 inline void drawAlembicCamera(const houdini_alembic::CameraObject *camera, ofMesh &camera_model) {
 	ofPushMatrix();
@@ -186,6 +213,9 @@ inline void drawAlembicScene(houdini_alembic::AlembicScene *scene, ofMesh &camer
 		}
 		else if (auto polygon = o.as_polygonMesh()) {
 			drawAlembicPolygon(polygon);
+		}
+		else if (auto curve = o.as_curve()) {
+			drawAlembicCurve(curve);
 		}
 	}
 }
