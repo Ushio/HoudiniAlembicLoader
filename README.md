@@ -15,6 +15,9 @@ No more *.dll
 ## demo
 ![demo](demo.gif)
 
+![points](demo_points.png)
+![curve](demo_curve.png)
+
 ## TODO
 - Details Attributes
 - Code Example

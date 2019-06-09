@@ -518,6 +518,23 @@ void ofApp::draw() {
 
 	ImGui::Begin("settings", nullptr);
 	ImGui::Text("fps: %.2f", ofGetFrameRate());
+
+	ImGui::SetNextTreeNodeOpen(true, ImGuiCond_Once);
+	if (ImGui::TreeNode("Load Example")) {
+		const char *abcs[] = {
+			"example1.abc",
+			"example2.abc",
+			"points.abc",
+			"lines_and_curves.abc",
+		};
+		for (auto abc : abcs) {
+			if (ImGui::Button(abc)) {
+				open_alembic(ofToDataPath(abc));
+			}
+		}
+		ImGui::TreePop();
+	}
+
 	ImGui::InputInt("Sample Index", &sample_index, 1);
 	ImGui::SliderInt("Sample Index Slider", &sample_index, 0, 255);
 
