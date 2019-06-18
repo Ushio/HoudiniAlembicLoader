@@ -348,13 +348,41 @@ namespace houdini_alembic {
 		SceneObject *operator->() const {
 			return _pointer.get();
 		}
+		SceneObject *get() const {
+			return _pointer.get();
+		}
 	private:
 		std::shared_ptr<SceneObject> _pointer;
 	};
 
 	class AlembicScene {
 	public:
+		PolygonMeshObject *polygonMesh_FirstVisible() const {
+			return firstVisible<PolygonMeshObject>();
+		}
+		PointObject *point_FirstVisible() const {
+			return firstVisible<PointObject>();
+		}
+		CurveObject *curve_FirstVisible() const {
+			return firstVisible<CurveObject>();
+		}
+		CameraObject *camera_FirstVisible() const {
+			return firstVisible<CameraObject>();
+		}
 		std::vector<SceneObjectPointer> objects;
+	private:
+		template <class T>
+		T *firstVisible() const {
+			for (auto o : objects) {
+				if (o->visible == false) {
+					continue;
+				}
+				if (auto obj = dynamic_cast<T *>(o.get())) {
+					return obj;
+				}
+			}
+			return nullptr;
+		}
 	};
 
 	class AlembicStorage {
