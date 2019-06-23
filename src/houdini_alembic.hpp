@@ -389,6 +389,7 @@ namespace houdini_alembic {
 	public:
 		bool open(const std::string &filePath, std::string &error_message);
 		bool isOpened() const;
+		void close();
 
 		// return null if failed to sample.
 		std::shared_ptr<AlembicScene> read(uint32_t index, std::string &error_message) const;

@@ -655,6 +655,9 @@ namespace houdini_alembic {
 	bool AlembicStorage::isOpened() const {
 		return (bool)_alembicArchive;
 	}
+	void AlembicStorage::close() {
+		_alembicArchive = std::shared_ptr<void>();
+	}
 	std::shared_ptr<AlembicScene> AlembicStorage::read(uint32_t index, std::string &error_message) const {
 		if (!_alembicArchive) {
 			return std::shared_ptr<AlembicScene>();
