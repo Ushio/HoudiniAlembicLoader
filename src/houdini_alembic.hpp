@@ -369,6 +369,18 @@ namespace houdini_alembic {
 		CameraObject *camera_FirstVisible() const {
 			return firstVisible<CameraObject>();
 		}
+		std::vector<PointObject *> point_AllVisible() const {
+			return allVisible<PointObject>();
+		}
+		std::vector<PolygonMeshObject *> polygonMesh_AllVisible() const {
+			return allVisible<PolygonMeshObject>();
+		}
+		std::vector<CurveObject *> curve_AllVisible() const {
+			return allVisible<CurveObject>();
+		}
+		std::vector<CameraObject *> camera_AllVisible() const {
+			return allVisible<CameraObject>();
+		}
 		std::vector<SceneObjectPointer> objects;
 	private:
 		template <class T>
@@ -382,6 +394,19 @@ namespace houdini_alembic {
 				}
 			}
 			return nullptr;
+		}
+		template <class T>
+		std::vector<T *> allVisible() const {
+			std::vector<T *> all;
+			for (auto o : objects) {
+				if (o->visible == false) {
+					continue;
+				}
+				if (auto obj = dynamic_cast<T *>(o.get())) {
+					all.push_back(obj);
+				}
+			}
+			return all;
 		}
 	};
 
