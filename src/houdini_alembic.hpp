@@ -148,27 +148,31 @@ namespace houdini_alembic {
 
 	class AttributeSpreadSheet {
 		template <class T>
-		const T *column_as(const char *key) const {
-			return dynamic_cast<const T *>(column(key));
+		const T *column_as(const char *key, AttributeType attributeType) const {
+			auto c = column(key);
+			if (c && c->attributeType() == attributeType) {
+				return static_cast<const T *>(column(key));
+			}
+			return nullptr;
 		}
 	public:
 		const AttributeStringColumn *column_as_string(const char *key) const {
-			return column_as<AttributeStringColumn>(key);
+			return column_as<AttributeStringColumn>(key, AttributeType_String);
 		}
 		const AttributeFloatColumn *column_as_float(const char *key) const {
-			return column_as<AttributeFloatColumn>(key);
+			return column_as<AttributeFloatColumn>(key, AttributeType_Float);
 		}
 		const AttributeIntColumn *column_as_int(const char *key) const {
-			return column_as<AttributeIntColumn>(key);
+			return column_as<AttributeIntColumn>(key, AttributeType_Int);
 		}
 		const AttributeVector2Column *column_as_vector2(const char *key) const {
-			return column_as<AttributeVector2Column>(key);
+			return column_as<AttributeVector2Column>(key, AttributeType_Vector2);
 		}
 		const AttributeVector3Column *column_as_vector3(const char *key) const {
-			return column_as<AttributeVector3Column>(key);
+			return column_as<AttributeVector3Column>(key, AttributeType_Vector3);
 		}
 		const AttributeVector4Column *column_as_vector4(const char *key) const {
-			return column_as<AttributeVector4Column>(key);
+			return column_as<AttributeVector4Column>(key, AttributeType_Vector4);
 		}
 
 		uint32_t rowCount() const {
